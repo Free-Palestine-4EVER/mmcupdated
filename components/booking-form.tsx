@@ -6,11 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
-import { CalendarIcon, X } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { X } from "lucide-react"
 
 // Import the server action at the top of the file
 import { sendBookingEmail } from "@/app/actions/send-booking-email"
@@ -48,7 +44,7 @@ interface FormData {
   name: string
   email: string
   phone: string
-  date: Date | null
+  date: string
   numPeople: number
   accommodation: string
   message: string
@@ -329,13 +325,15 @@ interface BookingFormProps {
 }
 
 export function BookingForm({ tourName, packageName }: BookingFormProps) {
+  // Get today's date in YYYY-MM-DD format for min attribute and default value
   const today = new Date()
+  const todayString = today.toISOString().split('T')[0]
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     phone: "",
-    date: null,
+    date: todayString,
     numPeople: 1,
     accommodation: "",
     message: "",
@@ -375,14 +373,15 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
   useEffect(() => {
     let total = 0
     let hotAirBalloonPrice = 0
+    let packagePrice = 0
 
     // Check if any selected tour qualifies for free tented camp accommodation
     const qualifiesForFreeTentedCamp = selectedTours.some((tourId) => {
       return tourId !== "sandboarding" && tourId !== "camel-rides" && tourId !== "hot-air-balloon"
     })
 
-    // Add accommodation price (free tented camp if qualifying tour is selected)
-    if (formData.accommodation) {
+    // Add accommodation price (free tented camp if qualifying tour is selected) - only if no package or "no-package" selected
+    if ((!formData.package || formData.package === "no-package") && formData.accommodation && formData.accommodation !== "none") {
       const selectedAccommodation = accommodationOptions.find((option) => option.id === formData.accommodation)
       if (selectedAccommodation) {
         // If tented camp is selected and user has a qualifying tour, it's free
@@ -394,14 +393,17 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
       }
     }
 
-    // Add package price if selected
-    if (formData.package) {
+    // Add package price if selected (packages don't get discounts)
+    if (formData.package && formData.package !== "no-package") {
       const selectedPackage = packageOptions.find((option) => option.id === formData.package)
       if (selectedPackage) {
-        total += selectedPackage.price * formData.numPeople
+        packagePrice = selectedPackage.price * formData.numPeople
+        total += packagePrice
       }
-    } else {
-      // Add tour prices only if no package is selected
+    }
+
+    // Add tour prices if no package is selected OR "no-package" is explicitly chosen
+    if (!formData.package || formData.package === "no-package") {
       selectedTours.forEach((tourId) => {
         const tour = tourOptions.find((option) => option.id === tourId)
         if (tour) {
@@ -422,9 +424,9 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
 
     setTotalPrice(total)
 
-    // Calculate discounted price (15% off, excluding hot air balloon)
-    const discountableAmount = total - hotAirBalloonPrice
-    const discounted = (discountableAmount * (1 - DISCOUNT_PERCENTAGE)) + hotAirBalloonPrice
+    // Calculate discounted price (15% off for tours only, excluding hot air balloon and packages)
+    const discountableAmount = total - hotAirBalloonPrice - packagePrice
+    const discounted = (discountableAmount * (1 - DISCOUNT_PERCENTAGE)) + hotAirBalloonPrice + packagePrice
     setDiscountedPrice(discounted)
   }, [formData.accommodation, formData.numPeople, selectedTours, formData.package])
 
@@ -440,13 +442,6 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
-
-  const handleDateSelect = (date: Date | undefined) => {
-    setFormData((prev) => ({
-      ...prev,
-      date: date || null,
     }))
   }
 
@@ -512,7 +507,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               name: "",
               email: "",
               phone: "",
-              date: null,
+              date: todayString,
               numPeople: 1,
               accommodation: "",
               message: "",
@@ -571,30 +566,17 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
             />
           </div>
           <div className="space-y-2">
-            <Label>Arrival Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !formData.date && "text-muted-foreground",
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formData.date ? format(formData.date, "PPP") : "Select a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={formData.date || undefined}
-                  onSelect={handleDateSelect}
-                  disabled={(date) => date < today}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <Label htmlFor="date">Arrival Date</Label>
+            <Input
+              id="date"
+              name="date"
+              type="date"
+              value={formData.date}
+              onChange={handleInputChange}
+              min={todayString}
+              required
+              className="w-full"
+            />
           </div>
         </div>
         <div className="space-y-2">
@@ -669,144 +651,153 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
         )}
       </div>
 
-      {!formData.package && (
-        <>
-          <div className="space-y-4 border-t pt-4">
-            <h3 className="text-xl font-semibold">Accommodation</h3>
-            <div className="space-y-2">
-              <Label htmlFor="accommodation">Select Accommodation</Label>
-              <Select
-                value={formData.accommodation}
-                onValueChange={(value) => handleSelectChange("accommodation", value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select accommodation type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">No accommodation needed</SelectItem>
-                  {accommodationOptions.map((option) => {
-                    // Check if any selected tour qualifies for free tented camp
-                    const qualifiesForFreeTentedCamp = selectedTours.some((tourId) => {
-                      return tourId !== "sandboarding" && tourId !== "camel-rides" && tourId !== "hot-air-balloon"
-                    })
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="text-xl font-semibold">Accommodation</h3>
+        {formData.package && formData.package !== "no-package" && (
+          <p className="text-sm text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-200">
+            Note: Your selected package already includes accommodation. You can ignore this section.
+          </p>
+        )}
+        <div className="space-y-2">
+          <Label htmlFor="accommodation">Select Accommodation</Label>
+          <Select
+            value={formData.accommodation}
+            onValueChange={(value) => handleSelectChange("accommodation", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select accommodation type" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">No accommodation needed</SelectItem>
+              {accommodationOptions.map((option) => {
+                // Check if any selected tour qualifies for free tented camp
+                const qualifiesForFreeTentedCamp = selectedTours.some((tourId) => {
+                  return tourId !== "sandboarding" && tourId !== "camel-rides" && tourId !== "hot-air-balloon"
+                })
 
-                    // Show "FREE" for tented camp if qualifying tour is selected
-                    const priceDisplay =
-                      qualifiesForFreeTentedCamp && option.id === "tented-camp"
-                        ? "FREE"
-                        : `${option.price} JOD per person`
+                // Show "FREE" for tented camp if qualifying tour is selected
+                const priceDisplay =
+                  qualifiesForFreeTentedCamp && option.id === "tented-camp"
+                    ? "FREE"
+                    : `${option.price} JOD per person`
 
-                    return (
-                      <SelectItem key={option.id} value={option.id}>
-                        {option.name} - {priceDisplay} ({option.description})
-                      </SelectItem>
-                    )
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+                return (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.name} - {priceDisplay} ({option.description})
+                  </SelectItem>
+                )
+              })}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
 
-          <div className="space-y-4 border-t pt-4">
-            <h3 className="text-xl font-semibold">Desert Experiences</h3>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="tourSelect">Select Tours</Label>
-                <Select
-                  onValueChange={(tourId: string) => {
-                    if (!selectedTours.includes(tourId)) {
-                      setSelectedTours((prev) => [...prev, tourId])
+      <div className="space-y-4 border-t pt-4">
+        <h3 className="text-xl font-semibold">Desert Experiences</h3>
+        {formData.package && formData.package !== "no-package" && (
+          <p className="text-sm text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-200">
+            Note: Your selected package already includes tours. You can select "No tour" if you don't need additional tours.
+          </p>
+        )}
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="tourSelect">Select Tours</Label>
+            <Select
+              onValueChange={(tourId: string) => {
+                if (tourId === "no-tour") {
+                  setSelectedTours([])
+                } else if (!selectedTours.includes(tourId)) {
+                  setSelectedTours((prev) => [...prev, tourId])
+                }
+              }}
+            >
+              <SelectTrigger id="tourSelect" className="w-full">
+                <SelectValue placeholder="Select a tour to add" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="no-tour">No tour needed</SelectItem>
+                {tourOptions.map((tour) => {
+                  let priceDisplay = ""
+                  if (tour.id === "stargazing") {
+                    if (formData.numPeople <= 3) {
+                      priceDisplay = `${(100 / formData.numPeople).toFixed(2)} JOD per person (100 JOD total for up to 3)`
+                    } else {
+                      const totalPrice = 100 + (formData.numPeople - 3) * 15
+                      priceDisplay = `${(totalPrice / formData.numPeople).toFixed(2)} JOD per person (${totalPrice} JOD total)`
                     }
-                  }}
-                >
-                  <SelectTrigger id="tourSelect" className="w-full">
-                    <SelectValue placeholder="Select a tour to add" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {tourOptions.map((tour) => {
-                      let priceDisplay = ""
-                      if (tour.id === "stargazing") {
-                        if (formData.numPeople <= 3) {
-                          priceDisplay = `${(100 / formData.numPeople).toFixed(2)} JOD per person (100 JOD total for up to 3)`
-                        } else {
-                          const totalPrice = 100 + (formData.numPeople - 3) * 15
-                          priceDisplay = `${(totalPrice / formData.numPeople).toFixed(2)} JOD per person (${totalPrice} JOD total)`
-                        }
-                      } else if (tour.id === "night-walk") {
-                        if (formData.numPeople < 5) {
-                          priceDisplay = `10 JOD per person (minimum 5 persons required)`
-                        } else {
-                          priceDisplay = `10 JOD per person`
-                        }
-                      } else {
-                        const price = getTourPrice(tour, formData.numPeople)
-                        priceDisplay = `${price} JOD per person`
-                      }
+                  } else if (tour.id === "night-walk") {
+                    if (formData.numPeople < 5) {
+                      priceDisplay = `10 JOD per person (minimum 5 persons required)`
+                    } else {
+                      priceDisplay = `10 JOD per person`
+                    }
+                  } else {
+                    const price = getTourPrice(tour, formData.numPeople)
+                    priceDisplay = `${price} JOD per person`
+                  }
 
-                      return (
-                        <SelectItem key={tour.id} value={tour.id}>
-                          {tour.name} - {priceDisplay}
-                        </SelectItem>
-                      )
-                    })}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {selectedTours.length > 0 && (
-                <div className="space-y-2 mt-4">
-                  <Label>Selected Tours</Label>
-                  <div className="space-y-2">
-                    {selectedTours.map((tourId) => {
-                      const tour = tourOptions.find((t) => t.id === tourId)
-                      if (!tour) return null // Handle the case where tour might be undefined
-
-                      let priceDisplay = ""
-                      let totalPrice = 0
-
-                      if (tour.id === "stargazing") {
-                        if (formData.numPeople <= 3) {
-                          const pricePerPerson = 100 / formData.numPeople
-                          totalPrice = 100
-                          priceDisplay = `${pricePerPerson.toFixed(2)} JOD per person × ${formData.numPeople} = ${totalPrice} JOD`
-                        } else {
-                          totalPrice = 100 + (formData.numPeople - 3) * 15
-                          const pricePerPerson = totalPrice / formData.numPeople
-                          priceDisplay = `${pricePerPerson.toFixed(2)} JOD per person × ${formData.numPeople} = ${totalPrice} JOD`
-                        }
-                      } else if (tour.id === "night-walk") {
-                        if (formData.numPeople < 5) {
-                          priceDisplay = `10 JOD per person (minimum 5 persons required)`
-                          totalPrice = 0
-                        } else {
-                          priceDisplay = `10 JOD × ${formData.numPeople} = ${10 * formData.numPeople} JOD`
-                          totalPrice = 10 * formData.numPeople
-                        }
-                      } else {
-                        const price = getTourPrice(tour, formData.numPeople)
-                        totalPrice = price * formData.numPeople
-                        priceDisplay = `${price} JOD per person × ${formData.numPeople} = ${totalPrice} JOD`
-                      }
-
-                      return (
-                        <div key={tourId} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
-                          <div>
-                            <span className="font-medium">{tour.name}</span>
-                            <span className="ml-2 text-gray-600">{priceDisplay}</span>
-                          </div>
-                          <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveTour(tourId)}>
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-            </div>
+                  return (
+                    <SelectItem key={tour.id} value={tour.id}>
+                      {tour.name} - {priceDisplay}
+                    </SelectItem>
+                  )
+                })}
+              </SelectContent>
+            </Select>
           </div>
-        </>
-      )}
+
+          {selectedTours.length > 0 && (
+            <div className="space-y-2 mt-4">
+              <Label>Selected Tours</Label>
+              <div className="space-y-2">
+                {selectedTours.map((tourId) => {
+                  const tour = tourOptions.find((t) => t.id === tourId)
+                  if (!tour) return null // Handle the case where tour might be undefined
+
+                  let priceDisplay = ""
+                  let totalPrice = 0
+
+                  if (tour.id === "stargazing") {
+                    if (formData.numPeople <= 3) {
+                      const pricePerPerson = 100 / formData.numPeople
+                      totalPrice = 100
+                      priceDisplay = `${pricePerPerson.toFixed(2)} JOD per person × ${formData.numPeople} = ${totalPrice} JOD`
+                    } else {
+                      totalPrice = 100 + (formData.numPeople - 3) * 15
+                      const pricePerPerson = totalPrice / formData.numPeople
+                      priceDisplay = `${pricePerPerson.toFixed(2)} JOD per person × ${formData.numPeople} = ${totalPrice} JOD`
+                    }
+                  } else if (tour.id === "night-walk") {
+                    if (formData.numPeople < 5) {
+                      priceDisplay = `10 JOD per person (minimum 5 persons required)`
+                      totalPrice = 0
+                    } else {
+                      priceDisplay = `10 JOD × ${formData.numPeople} = ${10 * formData.numPeople} JOD`
+                      totalPrice = 10 * formData.numPeople
+                    }
+                  } else {
+                    const price = getTourPrice(tour, formData.numPeople)
+                    totalPrice = price * formData.numPeople
+                    priceDisplay = `${price} JOD per person × ${formData.numPeople} = ${totalPrice} JOD`
+                  }
+
+                  return (
+                    <div key={tourId} className="flex justify-between items-center p-3 bg-gray-50 rounded-md">
+                      <div>
+                        <span className="font-medium">{tour.name}</span>
+                        <span className="ml-2 text-gray-600">{priceDisplay}</span>
+                      </div>
+                      <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveTour(tourId)}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
 
       <div className="space-y-4 border-t pt-4">
         <h3 className="text-xl font-semibold">Additional Information</h3>
@@ -840,7 +831,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
             </div>
           )}
 
-          {!formData.package && formData.accommodation && formData.accommodation !== "none" && (
+          {(!formData.package || formData.package === "no-package") && formData.accommodation && formData.accommodation !== "none" && (
             <div className="flex justify-between mb-2">
               <span>{accommodationOptions.find((a) => a.id === formData.accommodation)?.name}:</span>
               <span className="font-medium">
@@ -865,7 +856,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
             </div>
           )}
 
-          {!formData.package &&
+          {(!formData.package || formData.package === "no-package") &&
             selectedTours.map((tourId) => {
               const tour = tourOptions.find((t) => t.id === tourId)
               if (!tour) return null // Handle the case where tour might be undefined
@@ -900,26 +891,36 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               )
             })}
 
-          <div className="flex justify-between pt-2 border-t mt-2">
-            <span className="text-lg font-semibold">Subtotal:</span>
-            <span className="text-lg font-semibold">{totalPrice.toFixed(2)} JOD</span>
-          </div>
+          {/* Only show discount section if there's an actual discount (tours selected, no package) */}
+          {(!formData.package || formData.package === "no-package") && selectedTours.length > 0 && totalPrice !== discountedPrice ? (
+            <>
+              <div className="flex justify-between pt-2 border-t mt-2">
+                <span className="text-lg font-semibold">Subtotal:</span>
+                <span className="text-lg font-semibold">{totalPrice.toFixed(2)} JOD</span>
+              </div>
 
-          <div className="flex justify-between pt-2 text-green-600">
-            <span className="text-base font-semibold">Discount (15%):</span>
-            <span className="text-base font-semibold">-{(totalPrice * DISCOUNT_PERCENTAGE).toFixed(2)} JOD</span>
-          </div>
+              <div className="flex justify-between pt-2 text-green-600">
+                <span className="text-base font-semibold">Discount (15%):</span>
+                <span className="text-base font-semibold">-{(totalPrice * DISCOUNT_PERCENTAGE).toFixed(2)} JOD</span>
+              </div>
 
-          <div className="flex justify-between pt-2 border-t mt-2">
-            <span className="text-xl font-bold text-orange-600">Final Total:</span>
-            <span className="text-xl font-bold text-orange-600">{discountedPrice.toFixed(2)} JOD</span>
-          </div>
+              <div className="flex justify-between pt-2 border-t mt-2">
+                <span className="text-xl font-bold text-orange-600">Final Total:</span>
+                <span className="text-xl font-bold text-orange-600">{discountedPrice.toFixed(2)} JOD</span>
+              </div>
 
-          <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded">
-            <p className="text-sm text-center">
-              <span className="font-bold text-red-600">15% DISCOUNT APPLIED!</span>
-            </p>
-          </div>
+              <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded">
+                <p className="text-sm text-center">
+                  <span className="font-bold text-red-600">15% DISCOUNT APPLIED!</span>
+                </p>
+              </div>
+            </>
+          ) : (
+            <div className="flex justify-between pt-2 border-t mt-2">
+              <span className="text-xl font-bold text-orange-600">Total:</span>
+              <span className="text-xl font-bold text-orange-600">{totalPrice.toFixed(2)} JOD</span>
+            </div>
+          )}
         </div>
       </div>
 

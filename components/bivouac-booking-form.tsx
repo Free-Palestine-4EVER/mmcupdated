@@ -6,11 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { format } from "date-fns"
-import { CalendarIcon, X } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { X } from "lucide-react"
 
 // Import the server action at the top of the file
 import { sendBookingEmail } from "@/app/actions/send-booking-email"
@@ -32,7 +28,7 @@ interface FormData {
   name: string
   email: string
   phone: string
-  date: Date | null
+  date: string
   numPeople: number
   numDays: number
   message: string
@@ -199,13 +195,15 @@ const calculateStargazingPrice = (numPeople: number): number => {
 }
 
 export function BivouacBookingForm() {
+  // Get today's date in YYYY-MM-DD format for min attribute and default value
   const today = new Date()
+  const todayString = today.toISOString().split('T')[0]
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
     phone: "",
-    date: null,
+    date: todayString,
     numPeople: 1,
     numDays: 1,
     message: "",
@@ -250,13 +248,6 @@ export function BivouacBookingForm() {
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
-
-  const handleDateSelect = (date: Date | undefined) => {
-    setFormData((prev) => ({
-      ...prev,
-      date: date || null,
     }))
   }
 
@@ -314,7 +305,7 @@ export function BivouacBookingForm() {
               name: "",
               email: "",
               phone: "",
-              date: null,
+              date: todayString,
               numPeople: 1,
               numDays: 1,
               message: "",
@@ -372,30 +363,17 @@ export function BivouacBookingForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label>Arrival Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    "w-full justify-start text-left font-normal",
-                    !formData.date && "text-muted-foreground",
-                  )}
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {formData.date ? format(formData.date, "PPP") : "Select a date"}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={formData.date || undefined}
-                  onSelect={handleDateSelect}
-                  disabled={(date) => date < today}
-                  initialFocus
-                />
-              </PopoverContent>
-            </Popover>
+            <Label htmlFor="date">Arrival Date</Label>
+            <Input
+              id="date"
+              name="date"
+              type="date"
+              value={formData.date}
+              onChange={handleInputChange}
+              min={todayString}
+              required
+              className="w-full"
+            />
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
