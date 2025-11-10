@@ -490,6 +490,15 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
       // In a production app, you might want to show an error message instead
     }
 
+    // Track Google Ads conversion
+    if (typeof window !== 'undefined' && (window as any).gtag) {
+      (window as any).gtag('event', 'conversion', {
+        'send_to': 'AW-667842552',
+        'value': discountedPrice,
+        'currency': 'JOD'
+      })
+    }
+
     // Set submitted state regardless of email success
     setSubmitted(true)
   }
