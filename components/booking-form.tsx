@@ -493,7 +493,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
     // Track Google Ads conversion
     if (typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('event', 'conversion', {
-        'send_to': 'AW-667842552',
+        'send_to': 'AW-667842552/tGOcCKaO2r0bEJ7dndg-',
         'value': discountedPrice,
         'currency': 'JOD'
       })
