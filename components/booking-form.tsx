@@ -620,7 +620,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               <SelectItem value="no-package" className="text-xs">No package - select individual tours</SelectItem>
               {packageOptions.map((option) => (
                 <SelectItem key={option.id} value={option.id} className="text-xs">
-                  {option.name} - {option.price} JOD per person ({option.description})
+                  {option.name} - {option.price} JOD ({option.description})
                 </SelectItem>
               ))}
             </SelectContent>
