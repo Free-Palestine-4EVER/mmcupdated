@@ -83,11 +83,29 @@ export async function sendBookingEmail(formData: any) {
       specialRequests: formData.message,
     }
 
-    // Render HTML emails
-    const clientEmailHtml = render(ClientConfirmationEmail(emailData))
-    const adminEmailHtml = render(AdminNotificationEmail(emailData))
+    // Render HTML emails as JSX elements
+    const clientEmailHtml = String(
+      render(
+        ClientConfirmationEmail({
+          ...emailData,
+          tours: emailData.tours || [],
+          packageIncludes: emailData.packageIncludes || [],
+        })
+      )
+    )
+    const adminEmailHtml = String(
+      render(
+        AdminNotificationEmail({
+          ...emailData,
+          tours: emailData.tours || [],
+          packageIncludes: emailData.packageIncludes || [],
+        })
+      )
+    )
 
     console.log("Email templates rendered successfully")
+    console.log("Client email HTML length:", clientEmailHtml.length)
+    console.log("Admin email HTML length:", adminEmailHtml.length)
 
     // Send email to customer
     console.log("Sending confirmation email to customer:", formData.email)
