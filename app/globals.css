@@ -184,8 +184,9 @@ img {
 .marquee-content {
   display: flex;
   white-space: nowrap;
-  animation: marquee 5s linear infinite;
+  animation: marquee 15s linear infinite;
   gap: 2rem;
+  will-change: transform;
 }
 
 .marquee-item {
@@ -195,10 +196,10 @@ img {
 }
 
 @keyframes marquee {
-  0% {
+  from {
     transform: translateX(0);
   }
-  100% {
+  to {
     transform: translateX(-50%);
   }
 }
