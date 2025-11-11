@@ -8,6 +8,7 @@ import { WhatsAppChat } from "@/components/whatsapp-chat"
 import { DiscountModal } from "@/components/discount-modal"
 import { generateLocalBusinessSchema } from "@/lib/schema"
 import Script from "next/script"
+import { Analytics } from "@vercel/analytics/next"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -96,6 +97,7 @@ export default function RootLayout({
         <SiteFooter />
         <WhatsAppChat />
         <DiscountModal />
+        <Analytics />
       </body>
     </html>
   )
