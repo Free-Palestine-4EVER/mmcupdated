@@ -184,7 +184,7 @@ img {
 .marquee-content {
   display: flex;
   white-space: nowrap;
-  animation: marquee 15s linear infinite;
+  animation: marquee 5s linear infinite;
   gap: 2rem;
   will-change: transform;
 }
