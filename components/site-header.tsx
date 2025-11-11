@@ -12,7 +12,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
-import { X, Menu, ChevronDown, ChevronUp, Search } from "lucide-react"
+import { X, Menu, ChevronDown, ChevronUp, Search, Car } from "lucide-react"
 import { AnnouncementBar } from "@/components/announcement-bar"
 import { MobileSearch } from "./mobile-search"
 
@@ -335,6 +335,13 @@ export function SiteHeader() {
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link href="/transport" legacyBehavior passHref>
+                <NavigationMenuLink className="text-sm font-medium transition-colors hover:text-amber-500 focus:outline-none">
+                  Transport
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem>
             {/* <NavigationMenuItem>
               <Link href="/photography-drone-tour" legacyBehavior passHref>
                 <NavigationMenuLink className="relative text-sm font-bold bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 rounded-full transition-all hover:from-amber-600 hover:to-orange-700 hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none">
@@ -463,6 +470,15 @@ export function SiteHeader() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Home
+              </Link>
+
+              <Link
+                href="/transport"
+                className="py-2 text-lg font-medium border-b border-gray-100 flex items-center gap-2"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                <Car className="h-5 w-5 text-amber-500" />
+                Transport & Taxi
               </Link>
 
               {/* <Link
