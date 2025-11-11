@@ -92,12 +92,20 @@ DESERT EXPERIENCE TOURS
 
     if (formData.tours && formData.tours.length > 0) {
       formData.tours.forEach((tour: any, index: number) => {
+        const tourName = tour.name || tour || "N/A"
+        const pricePerPerson = tour.price !== undefined && tour.price !== null ? tour.price : "N/A"
+        const totalForTour = tour.totalPrice !== undefined && tour.totalPrice !== null
+          ? tour.totalPrice
+          : (tour.price !== undefined && tour.price !== null && formData.numPeople
+            ? tour.price * formData.numPeople
+            : "N/A")
+
         emailText += `
 Tour ${index + 1}:
-- Name: ${tour.name || "N/A"}
-- Price per person: ${tour.price || "N/A"} JOD
+- Name: ${tourName}
+- Price per person: ${pricePerPerson} JOD
 - Number of people: ${formData.numPeople || "N/A"}
-- Total for this tour: ${tour.totalPrice || (tour.price * formData.numPeople) || "N/A"} JOD`
+- Total for this tour: ${totalForTour} JOD`
       })
     } else {
       emailText += "\nNo additional tours selected"

@@ -1,8 +1,22 @@
 "use client"
 
 import Link from "next/link"
+import { useState, useEffect } from "react"
 
 export function FloatingBookButton() {
+  const [menuOpen, setMenuOpen] = useState(false)
+
+  useEffect(() => {
+    const handleMenuStateChange = (event: any) => {
+      setMenuOpen(event.detail.isOpen)
+    }
+
+    window.addEventListener("menuStateChange", handleMenuStateChange)
+    return () => window.removeEventListener("menuStateChange", handleMenuStateChange)
+  }, [])
+
+  if (menuOpen) return null
+
   return (
     <Link
       href="/contact-us#booking"

@@ -835,7 +835,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               <SelectTrigger id="tourSelect" className="w-full">
                 <SelectValue placeholder="Select a tour to add" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="max-h-[400px] overflow-y-auto">
                 <SelectItem value="no-tour" className="text-xs">No tour needed</SelectItem>
                 {tourOptions.map((tour) => {
                   let priceDisplay = ""
