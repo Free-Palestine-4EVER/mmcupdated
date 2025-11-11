@@ -83,8 +83,8 @@ export async function sendBookingEmail(formData: any) {
       specialRequests: formData.message,
     }
 
-    // Render HTML emails as JSX elements
-    const clientEmailHtml = String(
+    // Render HTML emails as JSX elements (await if Promise)
+    const clientEmailHtml = await Promise.resolve(
       render(
         ClientConfirmationEmail({
           ...emailData,
@@ -93,7 +93,7 @@ export async function sendBookingEmail(formData: any) {
         })
       )
     )
-    const adminEmailHtml = String(
+    const adminEmailHtml = await Promise.resolve(
       render(
         AdminNotificationEmail({
           ...emailData,
@@ -104,8 +104,10 @@ export async function sendBookingEmail(formData: any) {
     )
 
     console.log("Email templates rendered successfully")
-    console.log("Client email HTML length:", clientEmailHtml.length)
-    console.log("Admin email HTML length:", adminEmailHtml.length)
+    console.log("Client email HTML type:", typeof clientEmailHtml)
+    console.log("Client email HTML length:", clientEmailHtml?.length || 0)
+    console.log("Admin email HTML type:", typeof adminEmailHtml)
+    console.log("Admin email HTML length:", adminEmailHtml?.length || 0)
 
     // Send email to customer
     console.log("Sending confirmation email to customer:", formData.email)
