@@ -13,6 +13,21 @@ export default function ContactPage() {
         </div>
       </section>
 
+      {/* Booking Form Section */}
+      <section id="booking" className="py-16 bg-gray-50">
+        <div className="container">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Book Your Trip Now</h2>
+            <p className="text-lg text-gray-700 max-w-3xl mx-auto">
+              Ready to experience the magic of Wadi Rum? Use our booking form to reserve your desert adventure today.
+            </p>
+          </div>
+          <div className="mx-auto max-w-lg">
+            <BookingForm />
+          </div>
+        </div>
+      </section>
+
       {/* Contact Information */}
       <section className="py-16 bg-white">
         <div className="container">
@@ -72,21 +87,6 @@ export default function ContactPage() {
                 Chat on WhatsApp
               </a>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Booking Form Section */}
-      <section className="py-16 bg-gray-50">
-        <div className="container">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Book Your Trip Now</h2>
-            <p className="text-lg text-gray-700 max-w-3xl mx-auto">
-              Ready to experience the magic of Wadi Rum? Use our booking form to reserve your desert adventure today.
-            </p>
-          </div>
-          <div className="mx-auto max-w-lg">
-            <BookingForm />
           </div>
         </div>
       </section>

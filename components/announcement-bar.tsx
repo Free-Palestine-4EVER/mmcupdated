@@ -27,7 +27,7 @@ export function AnnouncementBar() {
             {announcements.map((ann, i) => (
               <span key={i}>
                 {renderAnnouncement(ann, i)}
-                {i < announcements.length - 1 && " 　•　 "}
+                {i < announcements.length - 1 && " • "}
               </span>
             ))}
           </span>
@@ -35,7 +35,7 @@ export function AnnouncementBar() {
             {announcements.map((ann, i) => (
               <span key={`dup-${i}`}>
                 {renderAnnouncement(ann, i)}
-                {i < announcements.length - 1 && " 　•　 "}
+                {i < announcements.length - 1 && " • "}
               </span>
             ))}
           </span>
