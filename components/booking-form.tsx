@@ -374,6 +374,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
     let total = 0
     let hotAirBalloonPrice = 0
     let packagePrice = 0
+    let toursPrice = 0
 
     // Check if any selected tour qualifies for free tented camp accommodation
     const qualifiesForFreeTentedCamp = selectedTours.some((tourId) => {
@@ -402,31 +403,34 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
       }
     }
 
-    // Add tour prices if no package is selected OR "no-package" is explicitly chosen
-    if (!formData.package || formData.package === "no-package") {
-      selectedTours.forEach((tourId) => {
-        const tour = tourOptions.find((option) => option.id === tourId)
-        if (tour) {
-          if (tour.id === "stargazing") {
-            // Special calculation for stargazing
-            total += calculateStargazingPrice(formData.numPeople) * formData.numPeople
-          } else if (tour.id === "hot-air-balloon") {
-            // Hot air balloon - no discount, track separately
-            const price = getTourPrice(tour, formData.numPeople) * formData.numPeople
-            hotAirBalloonPrice += price
-            total += price
-          } else {
-            total += getTourPrice(tour, formData.numPeople) * formData.numPeople
-          }
+    // Add tour prices - now ALWAYS included, whether package is selected or not
+    selectedTours.forEach((tourId) => {
+      const tour = tourOptions.find((option) => option.id === tourId)
+      if (tour) {
+        if (tour.id === "stargazing") {
+          // Special calculation for stargazing
+          const stargazingPrice = calculateStargazingPrice(formData.numPeople) * formData.numPeople
+          toursPrice += stargazingPrice
+          total += stargazingPrice
+        } else if (tour.id === "hot-air-balloon") {
+          // Hot air balloon - no discount, track separately
+          const price = getTourPrice(tour, formData.numPeople) * formData.numPeople
+          hotAirBalloonPrice += price
+          total += price
+        } else {
+          const price = getTourPrice(tour, formData.numPeople) * formData.numPeople
+          toursPrice += price
+          total += price
         }
-      })
-    }
+      }
+    })
 
     setTotalPrice(total)
 
     // Calculate discounted price (15% off for tours only, excluding hot air balloon and packages)
-    const discountableAmount = total - hotAirBalloonPrice - packagePrice
-    const discounted = (discountableAmount * (1 - DISCOUNT_PERCENTAGE)) + hotAirBalloonPrice + packagePrice
+    // Only tours (toursPrice) get the discount, not packages or hot air balloon
+    const discountedToursPrice = toursPrice * (1 - DISCOUNT_PERCENTAGE)
+    const discounted = packagePrice + hotAirBalloonPrice + discountedToursPrice + (total - packagePrice - hotAirBalloonPrice - toursPrice)
     setDiscountedPrice(discounted)
   }, [formData.accommodation, formData.numPeople, selectedTours, formData.package])
 
@@ -472,7 +476,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
           }
         : null,
       totalPrice,
-      discountAmount: totalPrice * DISCOUNT_PERCENTAGE,
+      discountAmount: totalPrice - discountedPrice,
       finalPrice: discountedPrice,
     }
 
@@ -705,7 +709,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
         <h3 className="text-xl font-semibold">Desert Experiences</h3>
         {formData.package && formData.package !== "no-package" && (
           <p className="text-sm text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-200">
-            Note: Your selected package already includes tours. You can select "No tour" if you don't need additional tours.
+            Note: Your selected package already includes tours. You can add additional tours below, and they will be calculated with a 15% discount applied to the tour prices.
           </p>
         )}
         <div className="space-y-4">
@@ -865,8 +869,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
             </div>
           )}
 
-          {(!formData.package || formData.package === "no-package") &&
-            selectedTours.map((tourId) => {
+          {selectedTours.map((tourId) => {
               const tour = tourOptions.find((t) => t.id === tourId)
               if (!tour) return null // Handle the case where tour might be undefined
 
@@ -900,8 +903,8 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               )
             })}
 
-          {/* Only show discount section if there's an actual discount (tours selected, no package) */}
-          {(!formData.package || formData.package === "no-package") && selectedTours.length > 0 && totalPrice !== discountedPrice ? (
+          {/* Show discount section if tours are selected (discount applies to tours only) */}
+          {selectedTours.length > 0 && totalPrice !== discountedPrice ? (
             <>
               <div className="flex justify-between pt-2 border-t mt-2">
                 <span className="text-lg font-semibold">Subtotal:</span>
@@ -909,8 +912,8 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               </div>
 
               <div className="flex justify-between pt-2 text-green-600">
-                <span className="text-base font-semibold">Discount (15%):</span>
-                <span className="text-base font-semibold">-{(totalPrice * DISCOUNT_PERCENTAGE).toFixed(2)} JOD</span>
+                <span className="text-base font-semibold">Tour Discount (15%):</span>
+                <span className="text-base font-semibold">-{(totalPrice - discountedPrice).toFixed(2)} JOD</span>
               </div>
 
               <div className="flex justify-between pt-2 border-t mt-2">
@@ -920,7 +923,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
 
               <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded">
                 <p className="text-sm text-center">
-                  <span className="font-bold text-red-600">15% DISCOUNT APPLIED!</span>
+                  <span className="font-bold text-red-600">15% DISCOUNT APPLIED TO TOURS!</span>
                 </p>
               </div>
             </>
