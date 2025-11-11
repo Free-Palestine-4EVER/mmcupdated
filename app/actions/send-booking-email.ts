@@ -105,11 +105,6 @@ Tour ${index + 1}:
     emailText += `
 
 ========================================
-HOT AIR BALLOON
-========================================
-${formData.hotAirBalloon ? "YES - Included in booking" : "No"}
-
-========================================
 TRANSPORT / TRANSFER
 ========================================
 Transport Needed: ${formData.transportNeeded ? "YES" : "No"}
