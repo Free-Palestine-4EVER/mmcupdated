@@ -182,14 +182,16 @@ img {
 }
 
 .marquee-content {
-  display: inline-block;
+  display: flex;
   white-space: nowrap;
-  animation: marquee 15s linear infinite;
+  animation: marquee 30s linear infinite;
+  gap: 2rem;
 }
 
-.marquee-content span {
-  display: inline-block;
-  padding-right: 100px;
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 @keyframes marquee {
