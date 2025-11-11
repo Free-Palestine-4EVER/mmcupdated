@@ -617,9 +617,9 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               <SelectValue placeholder="Select a package (optional)" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="no-package">No package - select individual tours</SelectItem>
+              <SelectItem value="no-package" className="text-xs">No package - select individual tours</SelectItem>
               {packageOptions.map((option) => (
-                <SelectItem key={option.id} value={option.id}>
+                <SelectItem key={option.id} value={option.id} className="text-xs">
                   {option.name} - {option.price} JOD per person ({option.description})
                 </SelectItem>
               ))}
@@ -677,7 +677,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               <SelectValue placeholder="Select accommodation type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">No accommodation needed</SelectItem>
+              <SelectItem value="none" className="text-xs">No accommodation needed</SelectItem>
               {accommodationOptions.map((option) => {
                 // Check if any selected tour qualifies for free tented camp
                 const qualifiesForFreeTentedCamp = selectedTours.some((tourId) => {
@@ -691,7 +691,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
                     : `${option.price} JOD per person`
 
                 return (
-                  <SelectItem key={option.id} value={option.id}>
+                  <SelectItem key={option.id} value={option.id} className="text-xs">
                     {option.name} - {priceDisplay} ({option.description})
                   </SelectItem>
                 )
@@ -724,7 +724,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
                 <SelectValue placeholder="Select a tour to add" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="no-tour">No tour needed</SelectItem>
+                <SelectItem value="no-tour" className="text-xs">No tour needed</SelectItem>
                 {tourOptions.map((tour) => {
                   let priceDisplay = ""
                   if (tour.id === "stargazing") {
@@ -746,7 +746,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
                   }
 
                   return (
-                    <SelectItem key={tour.id} value={tour.id}>
+                    <SelectItem key={tour.id} value={tour.id} className="text-xs">
                       {tour.name} - {priceDisplay}
                     </SelectItem>
                   )

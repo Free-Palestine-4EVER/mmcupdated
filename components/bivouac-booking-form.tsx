@@ -465,7 +465,7 @@ export function BivouacBookingForm() {
                   }
 
                   return (
-                    <SelectItem key={tour.id} value={tour.id}>
+                    <SelectItem key={tour.id} value={tour.id} className="text-xs">
                       {tour.name} - {priceDisplay}
                     </SelectItem>
                   )
