@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { Calendar } from "lucide-react"
 
 export function FloatingBookButton() {
   return (
@@ -10,8 +9,7 @@ export function FloatingBookButton() {
       className="fixed right-0 top-1/2 -translate-y-1/2 z-50 group"
       style={{ writingMode: "vertical-rl" }}
     >
-      <div className="bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-3 py-6 rounded-l-lg shadow-2xl transition-all duration-300 hover:scale-105 flex flex-col items-center gap-2">
-        <Calendar className="h-4 w-4" style={{ writingMode: "horizontal-tb" }} />
+      <div className="bg-gradient-to-br from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-3 py-6 rounded-l-lg shadow-2xl transition-all duration-300 hover:scale-105 flex items-center justify-center">
         <span className="font-bold text-sm whitespace-nowrap">Book Now</span>
       </div>
       {/* Pulse animation ring */}
