@@ -1,6 +1,6 @@
 export function AnnouncementBar() {
   const announcements = [
-    "Our camp has Wi-Fi connection",
+    "Our camp is equipped with Starlink Internet",
     "We offer discount for groups",
     "We can arrange taxi for you from any city in Jordan with best prices",
     "Hot air Balloon now available with us",
@@ -13,8 +13,8 @@ export function AnnouncementBar() {
     <div className="py-2 overflow-hidden" style={{ backgroundColor: 'rgb(251, 191, 36)' }}>
       <div className="marquee-container">
         <div className="marquee-content">
-          <span className="text-white font-medium">{marqueeText}</span>
-          <span className="text-white font-medium">{marqueeText}</span>
+          <span className="text-black font-medium">{marqueeText}</span>
+          <span className="text-black font-medium">{marqueeText}</span>
         </div>
       </div>
     </div>
