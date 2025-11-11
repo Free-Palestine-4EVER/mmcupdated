@@ -2,12 +2,14 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { BookingForm } from "@/components/booking-form"
+import { FloatingBookButton } from "@/components/floating-book-button"
 import { Check } from "lucide-react"
 import { ImageLightbox } from "@/components/image-lightbox"
 
 export default function TentedCampPage() {
   return (
     <div className="flex flex-col min-h-screen">
+      <FloatingBookButton />
       {/* Hero Section */}
       <section className="relative bg-black text-white">
         <div className="absolute inset-0 z-0">

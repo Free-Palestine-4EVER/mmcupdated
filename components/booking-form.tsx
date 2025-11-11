@@ -49,6 +49,19 @@ interface FormData {
   accommodation: string
   message: string
   package: string
+  transportNeeded: boolean
+  transportDetails: string
+  transportRoute: string
+  vegetarian: boolean
+  foodAllergies: string
+}
+
+interface TransportRoute {
+  id: string
+  from: string
+  to: string
+  price: number
+  description: string
 }
 
 // Define accommodation types and their prices
@@ -158,6 +171,65 @@ const packageOptions: PackageOption[] = [
     ],
   },
 ]
+
+// Define transport routes
+const transportRoutes: TransportRoute[] = [
+  {
+    id: "amman-wadirum",
+    from: "Amman",
+    to: "Wadi Rum",
+    price: 90,
+    description: "Direct transfer from Amman city to Wadi Rum (4 hours, 320 km)",
+  },
+  {
+    id: "amman-airport-wadirum",
+    from: "Amman Airport",
+    to: "Wadi Rum",
+    price: 110,
+    description: "Direct airport pickup from Queen Alia International Airport (4 hours, 330 km)",
+  },
+  {
+    id: "petra-wadirum",
+    from: "Petra",
+    to: "Wadi Rum",
+    price: 45,
+    description: "Convenient connection between UNESCO sites (1.5 hours, 100 km)",
+  },
+  {
+    id: "aqaba-wadirum",
+    from: "Aqaba",
+    to: "Wadi Rum",
+    price: 25,
+    description: "Quick transfer from Red Sea resort town (1 hour, 60 km)",
+  },
+  {
+    id: "aqaba-airport-wadirum",
+    from: "Aqaba Airport",
+    to: "Wadi Rum",
+    price: 35,
+    description: "Direct airport pickup from King Hussein International Airport (1 hour, 65 km)",
+  },
+]
+
+// Tour emojis mapping
+const tourEmojis: Record<string, string> = {
+  "half-day-jeep": "🚙",
+  "full-day-jeep": "🚗",
+  "two-hour-jeep": "🚕",
+  "beduin-way": "🏕️",
+  "jebel-khash": "⛰️",
+  "jebel-khash-2": "🏔️",
+  "hot-air-balloon": "🎈",
+  "burdah-arch": "🧗",
+  "all-in-one": "🌟",
+  "um-addami": "⛰️",
+  "camel-rides": "🐪",
+  "sandboarding": "🏂",
+  "trekking": "🥾",
+  "trekking-2-days": "🎒",
+  "night-walk": "🌙",
+  "stargazing": "⭐",
+}
 
 // Update the tourOptions array to ensure all options have a 7-100 people tier with the same price as 4-6 people
 const tourOptions: TourOption[] = [
@@ -338,7 +410,14 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
     accommodation: "",
     message: "",
     package: packageName || "",
+    transportNeeded: false,
+    transportDetails: "",
+    transportRoute: "",
+    vegetarian: false,
+    foodAllergies: "",
   })
+
+  const [transportDirection, setTransportDirection] = useState<{ [key: string]: boolean }>({})
 
   const [selectedTours, setSelectedTours] = useState<string[]>([])
   const [totalPrice, setTotalPrice] = useState(0)
@@ -375,6 +454,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
     let hotAirBalloonPrice = 0
     let packagePrice = 0
     let toursPrice = 0
+    let transportPrice = 0
 
     // Check if any selected tour qualifies for free tented camp accommodation
     const qualifiesForFreeTentedCamp = selectedTours.some((tourId) => {
@@ -425,14 +505,23 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
       }
     })
 
+    // Add transport price if selected (transport does NOT get discount)
+    if (formData.transportRoute) {
+      const selectedRoute = transportRoutes.find((route) => route.id === formData.transportRoute)
+      if (selectedRoute) {
+        transportPrice = selectedRoute.price
+        total += transportPrice
+      }
+    }
+
     setTotalPrice(total)
 
-    // Calculate discounted price (15% off for tours only, excluding hot air balloon and packages)
-    // Only tours (toursPrice) get the discount, not packages or hot air balloon
+    // Calculate discounted price (15% off for tours only, excluding hot air balloon, packages, AND transport)
+    // Only tours (toursPrice) get the discount, not packages, hot air balloon, or transport
     const discountedToursPrice = toursPrice * (1 - DISCOUNT_PERCENTAGE)
-    const discounted = packagePrice + hotAirBalloonPrice + discountedToursPrice + (total - packagePrice - hotAirBalloonPrice - toursPrice)
+    const discounted = packagePrice + hotAirBalloonPrice + transportPrice + discountedToursPrice + (total - packagePrice - hotAirBalloonPrice - transportPrice - toursPrice)
     setDiscountedPrice(discounted)
-  }, [formData.accommodation, formData.numPeople, selectedTours, formData.package])
+  }, [formData.accommodation, formData.numPeople, selectedTours, formData.package, formData.transportRoute])
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -525,6 +614,11 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               accommodation: "",
               message: "",
               package: "",
+              transportNeeded: false,
+              transportDetails: "",
+              transportRoute: "",
+              vegetarian: false,
+              foodAllergies: "",
             })
             setSelectedTours([])
             setTotalPrice(0)
@@ -751,7 +845,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
 
                   return (
                     <SelectItem key={tour.id} value={tour.id} className="text-xs">
-                      {tour.name} - {priceDisplay}
+                      {tourEmojis[tour.id]} {tour.name} - {priceDisplay}
                     </SelectItem>
                   )
                 })}
@@ -814,6 +908,146 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
 
       <div className="space-y-4 border-t pt-4">
         <h3 className="text-xl font-semibold">Additional Information</h3>
+
+        {/* Transport Section */}
+        <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="transportNeeded"
+              checked={formData.transportNeeded}
+              onChange={(e) => handleSelectChange("transportNeeded", e.target.checked)}
+              className="w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500"
+            />
+            <Label htmlFor="transportNeeded" className="cursor-pointer">
+              🚗 I need transport/taxi service to Wadi Rum
+            </Label>
+          </div>
+          {formData.transportNeeded && (
+            <div className="space-y-4 ml-6">
+              <div className="space-y-2">
+                <Label htmlFor="transportRoute">Select Route</Label>
+                <Select
+                  value={formData.transportRoute}
+                  onValueChange={(value) => handleSelectChange("transportRoute", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your transport route" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {transportRoutes.map((route) => {
+                      const isReversed = transportDirection[route.id]
+                      const displayFrom = isReversed ? route.to : route.from
+                      const displayTo = isReversed ? route.from : route.to
+
+                      return (
+                        <SelectItem key={route.id} value={route.id} className="text-xs">
+                          {displayFrom} → {displayTo} - {route.price} JOD per vehicle
+                        </SelectItem>
+                      )
+                    })}
+                  </SelectContent>
+                </Select>
+                <p className="text-xs text-gray-600">
+                  All prices are per vehicle (up to 4 passengers), not per person
+                </p>
+              </div>
+
+              {formData.transportRoute && (
+                <div className="bg-white p-3 rounded-md border border-gray-200">
+                  {(() => {
+                    const selectedRoute = transportRoutes.find((r) => r.id === formData.transportRoute)
+                    if (!selectedRoute) return null
+                    const isReversed = transportDirection[selectedRoute.id]
+                    const displayFrom = isReversed ? selectedRoute.to : selectedRoute.from
+                    const displayTo = isReversed ? selectedRoute.from : selectedRoute.to
+
+                    return (
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-gray-900">
+                              {displayFrom} → {displayTo}
+                            </p>
+                            <p className="text-sm text-gray-600">{selectedRoute.description}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTransportDirection((prev) => ({
+                                ...prev,
+                                [selectedRoute.id]: !prev[selectedRoute.id],
+                              }))
+                            }}
+                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                            aria-label="Switch direction"
+                          >
+                            <svg
+                              className="w-5 h-5 text-amber-600"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                        <p className="text-lg font-bold text-amber-600">{selectedRoute.price} JOD</p>
+                      </div>
+                    )
+                  })()}
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Label htmlFor="transportDetails">Additional Transport Details (Optional)</Label>
+                <Textarea
+                  id="transportDetails"
+                  name="transportDetails"
+                  value={formData.transportDetails}
+                  onChange={handleInputChange}
+                  placeholder="e.g., Flight number, pickup time preferences, special requests"
+                  rows={3}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Food Preferences Section */}
+        <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+          <h4 className="font-semibold text-gray-900">Food Preferences</h4>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="vegetarian"
+                checked={formData.vegetarian}
+                onChange={(e) => handleSelectChange("vegetarian", e.target.checked)}
+                className="w-4 h-4 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500"
+              />
+              <Label htmlFor="vegetarian" className="cursor-pointer">
+                🥗 Vegetarian meals required
+              </Label>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="foodAllergies">Food Allergies or Dietary Restrictions</Label>
+              <Input
+                id="foodAllergies"
+                name="foodAllergies"
+                value={formData.foodAllergies}
+                onChange={handleInputChange}
+                placeholder="e.g., Nuts, Gluten, Dairy, etc."
+              />
+            </div>
+          </div>
+        </div>
+
         <div className="space-y-2">
           <Label htmlFor="message">Special Requests or Questions</Label>
           <Textarea
@@ -902,6 +1136,25 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
                 </div>
               )
             })}
+
+          {/* Transport price (no discount) */}
+          {formData.transportRoute && (
+            <div className="flex justify-between mb-2 bg-blue-50 p-2 rounded">
+              <span>
+                {(() => {
+                  const selectedRoute = transportRoutes.find((r) => r.id === formData.transportRoute)
+                  if (!selectedRoute) return "Transport:"
+                  const isReversed = transportDirection[selectedRoute.id]
+                  const displayFrom = isReversed ? selectedRoute.to : selectedRoute.from
+                  const displayTo = isReversed ? selectedRoute.from : selectedRoute.to
+                  return `Transport (${displayFrom} → ${displayTo}):`
+                })()}
+              </span>
+              <span className="font-medium">
+                {transportRoutes.find((r) => r.id === formData.transportRoute)?.price} JOD (per vehicle)
+              </span>
+            </div>
+          )}
 
           {/* Show discount section if tours are selected (discount applies to tours only) */}
           {selectedTours.length > 0 && totalPrice !== discountedPrice ? (

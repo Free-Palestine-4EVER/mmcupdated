@@ -3,6 +3,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { AnimateOnScroll } from "@/components/animate-on-scroll"
 import { BookingForm } from "@/components/booking-form"
+import { FloatingBookButton } from "@/components/floating-book-button"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 export default function ClassicAdventurePage() {
   return (
     <div className="bg-white">
+      <FloatingBookButton />
       {/* Hero Section */}
       <div className="relative h-[50vh] md:h-[60vh] lg:h-[70vh] w-full">
         <Image

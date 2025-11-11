@@ -1,36 +1,36 @@
-import type { Metadata } from "next"
+"use client"
+
 import Image from "next/image"
 import Link from "next/link"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { BookingForm } from "@/components/booking-form"
-import { Car, MapPin, Clock, Users, CheckCircle2, ArrowRight, Phone } from "lucide-react"
-
-export const metadata: Metadata = {
-  title: "Wadi Rum Transport & Taxi Service | Amman, Petra, Aqaba Transfers",
-  description:
-    "Reliable taxi and transport service to Wadi Rum from Amman, Petra, and Aqaba. Professional drivers, comfortable vehicles, competitive prices. Book your Wadi Rum transfer today.",
-  keywords:
-    "wadi rum transport, wadi rum taxi, amman to wadi rum, petra to wadi rum, aqaba to wadi rum, wadi rum to petra, wadi rum to amman, wadi rum to aqaba, jordan taxi service, wadi rum airport transfer",
-  openGraph: {
-    title: "Wadi Rum Transport & Taxi Service - Safe & Reliable Transfers",
-    description:
-      "Professional transport service to and from Wadi Rum. Amman, Petra, Aqaba transfers available. Comfortable vehicles, experienced drivers.",
-    images: ["/images/half-day-jeep-hero.jpg"],
-  },
-}
+import { Car, MapPin, Clock, Users, CheckCircle2, ArrowRight, Phone, Calendar, ArrowLeftRight } from "lucide-react"
 
 export default function TransportPage() {
   const routes = [
     {
+      id: "amman-airport",
+      from: "Amman Airport",
+      to: "Wadi Rum",
+      price: 110,
+      duration: "4 hours",
+      distance: "330 km",
+      description: "Direct transfer from Queen Alia International Airport to Wadi Rum",
+      popular: true,
+    },
+    {
+      id: "amman",
       from: "Amman",
       to: "Wadi Rum",
       price: 90,
       duration: "4 hours",
       distance: "320 km",
-      description: "Direct transfer from Amman city or Queen Alia International Airport to Wadi Rum",
+      description: "Direct transfer from Amman city to Wadi Rum",
       popular: true,
     },
     {
+      id: "petra",
       from: "Petra",
       to: "Wadi Rum",
       price: 45,
@@ -40,6 +40,7 @@ export default function TransportPage() {
       popular: true,
     },
     {
+      id: "aqaba",
       from: "Aqaba",
       to: "Wadi Rum",
       price: 25,
@@ -49,6 +50,7 @@ export default function TransportPage() {
       popular: false,
     },
     {
+      id: "aqaba-airport",
       from: "Aqaba Airport",
       to: "Wadi Rum",
       price: 35,
@@ -59,13 +61,21 @@ export default function TransportPage() {
     },
   ]
 
+  const [routeDirections, setRouteDirections] = useState<{ [key: string]: boolean }>(
+    routes.reduce((acc, route) => ({ ...acc, [route.id]: false }), {})
+  )
+
+  const toggleDirection = (routeId: string) => {
+    setRouteDirections(prev => ({ ...prev, [routeId]: !prev[routeId] }))
+  }
+
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center">
+      <section className="relative min-h-[70vh] md:h-[80vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/half-day-jeep-hero.jpg"
+            src="/images/transport-hero.jpg"
             alt="Wadi Rum Transport and Taxi Service"
             fill
             className="object-cover"
@@ -95,15 +105,14 @@ export default function TransportPage() {
 
             <div className="flex flex-wrap gap-4">
               <Link href="#routes">
-                <Button size="lg" className="bg-amber-500 hover:bg-amber-600 px-8 py-6 text-base">
+                <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-6 text-base">
                   View Routes & Prices
                 </Button>
               </Link>
               <Link href="#booking">
                 <Button
                   size="lg"
-                  variant="outline"
-                  className="border-2 border-white text-white hover:bg-white/10 px-8 py-6 text-base backdrop-blur-sm"
+                  className="bg-white/20 hover:bg-white/30 text-white border-2 border-white backdrop-blur-sm px-8 py-6 text-base"
                 >
                   Book Now
                 </Button>
@@ -144,60 +153,83 @@ export default function TransportPage() {
             <h2 className="text-4xl md:text-5xl font-light text-slate-900 mb-4">
               Routes <span className="font-bold">& Pricing</span>
             </h2>
-            <p className="text-lg text-gray-600">
-              All prices are per vehicle, not per person. Round trip available at double price.
+            <p className="text-lg text-gray-600 mb-3">
+              All prices are per vehicle, not per person.
             </p>
+            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 px-4 py-2 rounded-full">
+              <ArrowLeftRight className="h-4 w-4 text-blue-600" />
+              <span className="text-sm text-blue-700 font-medium">Click the swap icon on each route to switch directions</span>
+            </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-6">
-            {routes.map((route, index) => (
-              <div
-                key={index}
-                className={`relative bg-white rounded-2xl border-2 p-8 hover:shadow-xl transition-all ${
-                  route.popular ? "border-amber-500 shadow-lg" : "border-gray-200"
-                }`}
-              >
-                {route.popular && (
-                  <div className="absolute -top-3 left-6 bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                    Popular Route
-                  </div>
-                )}
+            {routes.map((route, index) => {
+              const isReversed = routeDirections[route.id]
+              const displayFrom = isReversed ? route.to : route.from
+              const displayTo = isReversed ? route.from : route.to
 
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <MapPin className="h-5 w-5 text-amber-500" />
-                      <span className="text-xl font-bold text-slate-900">{route.from}</span>
+              return (
+                <div
+                  key={index}
+                  className={`relative bg-white rounded-2xl border-2 p-8 hover:shadow-xl transition-all ${
+                    route.popular ? "border-amber-500 shadow-lg" : "border-gray-200"
+                  }`}
+                >
+                  {route.popular && (
+                    <div className="absolute -top-3 left-6 bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                      Popular Route
                     </div>
-                    <div className="flex items-center gap-3 ml-8">
-                      <ArrowRight className="h-5 w-5 text-gray-400" />
-                      <span className="text-xl font-bold text-slate-900">{route.to}</span>
+                  )}
+
+                  <div className="flex items-start justify-between mb-6">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <MapPin className="h-5 w-5 text-amber-500" />
+                        <span className="text-xl font-bold text-slate-900">{displayFrom}</span>
+                      </div>
+                      <div className="flex items-center gap-3 ml-8">
+                        <button
+                          onClick={() => toggleDirection(route.id)}
+                          className="hover:bg-gray-100 rounded-full p-1 transition-colors"
+                          aria-label="Switch direction"
+                        >
+                          <ArrowLeftRight className="h-5 w-5 text-gray-400 hover:text-amber-500" />
+                        </button>
+                        <span className="text-xl font-bold text-slate-900">{displayTo}</span>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-3xl font-bold text-amber-600">{route.price}</div>
+                      <div className="text-sm text-gray-600">JOD</div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-3xl font-bold text-amber-600">{route.price}</div>
-                    <div className="text-sm text-gray-600">JOD</div>
-                  </div>
-                </div>
 
-                <p className="text-gray-600 mb-6">{route.description}</p>
+                  <p className="text-gray-600 mb-6">{route.description}</p>
 
-                <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
-                    <span>{route.duration}</span>
+                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
+                    <div className="flex items-center gap-2">
+                      <Clock className="h-4 w-4" />
+                      <span>{route.duration}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4" />
+                      <span>{route.distance}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      <span>Up to 4 passengers</span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    <span>{route.distance}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
-                    <span>Up to 4 passengers</span>
-                  </div>
+
+                  <Link href="#booking">
+                    <Button className="w-full bg-amber-500 hover:bg-amber-600 flex items-center justify-center gap-2">
+                      <Calendar className="h-4 w-4" />
+                      Book Ride Now
+                    </Button>
+                  </Link>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           <div className="mt-12 bg-blue-50 border border-blue-200 rounded-2xl p-6">
@@ -320,13 +352,25 @@ export default function TransportPage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             <div>
-              <h3 className="text-2xl font-bold mb-4 text-amber-400">Amman to Wadi Rum Transfer</h3>
+              <h3 className="text-2xl font-bold mb-4 text-amber-400">Amman Airport to Wadi Rum Transfer</h3>
               <p className="text-gray-300 mb-4">
-                The most popular route from Jordan's capital to the stunning Wadi Rum desert. Perfect for travelers
-                arriving at Queen Alia International Airport who want to start their desert adventure immediately.
+                Most convenient route from Queen Alia International Airport directly to Wadi Rum. Perfect for international travelers who want to skip Amman and head straight to the desert.
               </p>
               <ul className="space-y-2 text-gray-300">
-                <li>• Direct transfer from Amman city center or airport</li>
+                <li>• Direct airport pickup with meet & greet</li>
+                <li>• 4-hour comfortable journey to the desert</li>
+                <li>• Professional English-speaking drivers</li>
+                <li>• 110 JOD per vehicle (up to 4 passengers)</li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 className="text-2xl font-bold mb-4 text-amber-400">Amman to Wadi Rum Transfer</h3>
+              <p className="text-gray-300 mb-4">
+                Popular route from Jordan's capital to the stunning Wadi Rum desert. Perfect for travelers staying in Amman who want to experience the desert adventure.
+              </p>
+              <ul className="space-y-2 text-gray-300">
+                <li>• Direct transfer from Amman city center</li>
                 <li>• 4-hour comfortable journey through scenic Jordan</li>
                 <li>• Professional English-speaking drivers</li>
                 <li>• 90 JOD per vehicle (up to 4 passengers)</li>
@@ -360,20 +404,6 @@ export default function TransportPage() {
                 <li>• 25 JOD per vehicle (up to 4 passengers)</li>
               </ul>
             </div>
-
-            <div>
-              <h3 className="text-2xl font-bold mb-4 text-amber-400">Aqaba Airport Transfer</h3>
-              <p className="text-gray-300 mb-4">
-                Direct pickup from King Hussein International Airport (Aqaba Airport) to Wadi Rum. Skip the hassle and
-                start your adventure right away.
-              </p>
-              <ul className="space-y-2 text-gray-300">
-                <li>• Meet & greet at airport arrivals</li>
-                <li>• 1-hour wait time included for flight delays</li>
-                <li>• Direct to your Wadi Rum accommodation</li>
-                <li>• 35 JOD per vehicle (up to 4 passengers)</li>
-              </ul>
-            </div>
           </div>
         </div>
       </section>
@@ -396,8 +426,7 @@ export default function TransportPage() {
             <Link href="/contact-us">
               <Button
                 size="lg"
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white/10 px-10 py-6 text-base font-semibold"
+                className="bg-white/20 hover:bg-white/30 text-white border-2 border-white backdrop-blur-sm px-10 py-6 text-base font-semibold"
               >
                 Contact Us
               </Button>
@@ -408,16 +437,16 @@ export default function TransportPage() {
 
       {/* Booking Section */}
       <section id="booking" className="py-24 bg-slate-50">
-        <div className="container max-w-4xl">
+        <div className="container px-4 md:px-8 lg:px-12">
           <div className="text-center mb-12">
             <h2 className="text-4xl md:text-5xl font-light text-slate-900 mb-4">
               Book Your <span className="font-bold">Transport</span>
             </h2>
             <p className="text-lg text-gray-600">
-              Fill in the form below and specify your transport needs in the message section
+              Fill in the form below and specify your transport route. Check the transport option for detailed pickup information.
             </p>
           </div>
-          <div className="bg-white rounded-2xl shadow-xl p-8">
+          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
             <BookingForm tourName="Transport Service" />
           </div>
         </div>

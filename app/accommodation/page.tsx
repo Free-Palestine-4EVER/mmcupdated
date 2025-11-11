@@ -2,6 +2,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { AnimateOnScroll } from "@/components/animate-on-scroll"
+import { FloatingBookButton } from "@/components/floating-book-button"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 export default function AccommodationPage() {
   return (
     <div className="flex flex-col min-h-screen">
+      <FloatingBookButton />
       {/* Hero Section */}
       <section className="relative bg-black text-white">
         <div className="absolute inset-0 z-0">

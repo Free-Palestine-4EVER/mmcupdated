@@ -2,6 +2,7 @@ import Image from "next/image"
 import Script from "next/script"
 import { TourCard } from "@/components/tour-card"
 import { AnimateOnScroll } from "@/components/animate-on-scroll"
+import { FloatingBookButton } from "@/components/floating-book-button"
 import { generateTourSchema } from "@/lib/schema"
 import type { Metadata } from "next"
 
@@ -147,6 +148,7 @@ export default function DesertExperiencesPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <FloatingBookButton />
       {/* Schema.org structured data */}
       {tourSchemas.map((schema, index) => (
         <Script

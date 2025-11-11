@@ -1,6 +1,9 @@
 "use server"
 
 import { Resend } from "resend"
+import { render } from "@react-email/render"
+import { ClientConfirmationEmail } from "@/emails/client-confirmation"
+import { AdminNotificationEmail } from "@/emails/admin-notification"
 
 // Enhanced fallback mechanism for development and production
 const getEmailService = () => {
@@ -48,93 +51,91 @@ export async function sendBookingEmail(formData: any) {
     console.log("Starting email sending process...")
     console.log("API Key available:", !!process.env.RESEND_API_KEY)
 
-    // Format the booking details for the email
-    const formatBookingDetails = (data: any) => {
-      const { name, email, phone, date, numPeople, accommodation, tours, totalPrice, message, packageDetails } = data
+    // Format the date
+    const formattedDate = formData.date
+      ? new Date(formData.date).toLocaleDateString("en-US", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        })
+      : "Not specified"
 
-      // Format the date
-      const formattedDate = date
-        ? new Date(date).toLocaleDateString("en-US", {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })
-        : "Not specified"
-
-      // Format tours
-      const formattedTours = Array.isArray(tours)
-        ? tours.map((tour: string) => `- ${tour}`).join("\n")
-        : "None selected"
-
-      // Format package details if available
-      let packageSection = ""
-      if (packageDetails) {
-        const includesList = packageDetails.includes.map((item: string) => `  - ${item}`).join("\n")
-        packageSection = `
-Selected Package: ${packageDetails.name}
-Package Price: ${packageDetails.price} JOD per person
-Package Duration: ${packageDetails.duration}
-Package Includes:
-${includesList}
-`
-      }
-
-      return `
-Name: ${name}
-Email: ${email}
-Phone: ${phone}
-Arrival Date: ${formattedDate}
-Number of People: ${numPeople}
-${
-  packageDetails
-    ? packageSection
-    : `Accommodation: ${accommodation || "None selected"}
-Tours:
-${formattedTours}`
-}
-
-Total Price: ${totalPrice} JOD
-
-Special Requests:
-${message || "None"}
-      `
+    // Prepare common data for both emails
+    const emailData = {
+      customerName: formData.name,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      arrivalDate: formattedDate,
+      numPeople: formData.numPeople,
+      accommodation: formData.accommodation,
+      tours: formData.tours || [],
+      packageName: formData.packageDetails?.name,
+      packageDuration: formData.packageDetails?.duration,
+      packageIncludes: formData.packageDetails?.includes,
+      totalPrice: formData.totalPrice,
+      discountAmount: formData.discountAmount || 0,
+      finalPrice: formData.finalPrice,
+      transportNeeded: formData.transportNeeded,
+      transportDetails: formData.transportDetails,
+      vegetarian: formData.vegetarian,
+      foodAllergies: formData.foodAllergies,
+      specialRequests: formData.message,
     }
 
-    const emailContent = formatBookingDetails(formData)
-    console.log("Email content prepared:", emailContent)
+    // Render HTML emails
+    const clientEmailHtml = render(ClientConfirmationEmail(emailData))
+    const adminEmailHtml = render(AdminNotificationEmail(emailData))
 
-    // Send the email
-    console.log("Sending email to: mohammed.mutlak.camp@gmail.com")
+    console.log("Email templates rendered successfully")
+
+    // Send email to customer
+    console.log("Sending confirmation email to customer:", formData.email)
 
     try {
-      const { data, error } = await emailService.emails.send({
-        from: "Wadi Rum Booking <onboarding@resend.dev>",
-        to: "mohammed.mutlak.camp@gmail.com",
-        subject: `New Booking Request from ${formData.name}`,
-        text: `
-New booking request from your website:
-
-${emailContent}
-        `,
+      const clientResult = await emailService.emails.send({
+        from: "Mohammed Mutlak Camp <onboarding@resend.dev>",
+        to: formData.email,
+        subject: "Your Wadi Rum Reservation – Arrival Details",
+        html: clientEmailHtml,
       })
 
-      if (error) {
-        console.error("Error sending email:", error)
-        return { success: false, error: `Failed to send booking email: ${error.message}` }
+      if (clientResult.error) {
+        console.error("Error sending customer email:", clientResult.error)
+      } else {
+        console.log("Customer email sent successfully with ID:", clientResult.data?.id)
+      }
+    } catch (clientEmailError: any) {
+      console.error("Exception sending customer email:", clientEmailError)
+    }
+
+    // Send email to admin
+    console.log("Sending notification email to admin: mohammed.mutlak.camp@gmail.com")
+
+    try {
+      const adminResult = await emailService.emails.send({
+        from: "Wadi Rum Booking System <onboarding@resend.dev>",
+        to: "mohammed.mutlak.camp@gmail.com",
+        subject: `🎉 New Booking Request from ${formData.name}`,
+        html: adminEmailHtml,
+      })
+
+      if (adminResult.error) {
+        console.error("Error sending admin email:", adminResult.error)
+        return { success: false, error: `Failed to send admin email: ${adminResult.error.message}` }
       }
 
-      console.log("Email sent successfully with ID:", data?.id)
-      return { success: true, data }
-    } catch (emailError: any) {
-      console.error("Exception when calling emailService.emails.send:", emailError)
+      console.log("Admin email sent successfully with ID:", adminResult.data?.id)
+      return { success: true, data: adminResult.data }
+    } catch (adminEmailError: any) {
+      console.error("Exception sending admin email:", adminEmailError)
 
       // Always return success to the client, but log the error
       // This ensures the user gets a good experience even if email fails
       return {
         success: true,
         data: { id: "error-fallback-id" },
-        _error: `Email sending error: ${emailError?.message || "Unknown error"}`,
+        _error: `Email sending error: ${adminEmailError?.message || "Unknown error"}`,
       }
     }
   } catch (error: any) {

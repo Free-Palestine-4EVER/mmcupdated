@@ -6,10 +6,12 @@ import { Clock, Users, Globe } from "lucide-react"
 import { FAQSection } from "@/components/faq-section"
 import { desertExperienceFaqs } from "@/data/desert-experience-faqs"
 import { ImageLightbox } from "@/components/image-lightbox"
+import { FloatingBookButton } from "@/components/floating-book-button"
 
 export default function HalfDayJeepTourPage() {
   return (
     <div className="flex flex-col min-h-screen">
+      <FloatingBookButton />
       {/* Hero Section */}
       <section className="relative bg-black text-white">
         <div className="absolute inset-0 z-0">

@@ -2,6 +2,7 @@ import Image from "next/image"
 import type { Metadata } from "next"
 import { BivouacBookingForm } from "@/components/bivouac-booking-form"
 import { AnimateOnScroll } from "@/components/animate-on-scroll"
+import { FloatingBookButton } from "@/components/floating-book-button"
 
 export const metadata: Metadata = {
   title: "Bivouac Camping Experience | Wadi Rum Desert",
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
 export default function BivouacPage() {
   return (
     <div className="bg-white">
+      <FloatingBookButton />
       {/* Hero Section */}
       <div className="relative h-[50vh] md:h-[60vh] lg:h-[70vh] w-full">
         <Image
@@ -151,7 +153,7 @@ export default function BivouacPage() {
             <AnimateOnScroll animation="fade-right">
               <div className="relative h-[400px] rounded-lg overflow-hidden shadow-xl">
                 <Image
-                  src="/images/desert-night.png"
+                  src="/images/desert-night.jpg"
                   alt="Starry night sky over Wadi Rum desert"
                   fill
                   className="object-cover"

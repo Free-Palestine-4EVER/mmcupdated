@@ -12,7 +12,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
-import { X, Menu, ChevronDown, ChevronUp, Search, Car } from "lucide-react"
+import { X, Menu, ChevronDown, ChevronUp, Search, Car, Home, Compass, Package, Tent, Droplets, Building2, Info, Phone, Lightbulb, HelpCircle, BookOpen, Castle, Users, Truck, Mountain, Wind, Footprints, Moon, Star, Backpack, Coffee, Bed, Trees, CarFront, MountainSnow, Sunrise } from "lucide-react"
 import { AnnouncementBar } from "@/components/announcement-bar"
 import { MobileSearch } from "./mobile-search"
 
@@ -370,13 +370,6 @@ export function SiteHeader() {
               </Link>
             </NavigationMenuItem>
             <NavigationMenuItem>
-              <Link href="/about-us" legacyBehavior passHref>
-                <NavigationMenuLink className="text-sm font-medium transition-colors hover:text-amber-500 focus:outline-none">
-                  About Us
-                </NavigationMenuLink>
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
               <Link href="/contact-us" legacyBehavior passHref>
                 <NavigationMenuLink className="text-sm font-medium transition-colors hover:text-amber-500 focus:outline-none">
                   Contact us
@@ -463,21 +456,22 @@ export function SiteHeader() {
           </div>
 
           <div className="container overflow-y-auto pb-12 pt-4">
-            <nav className="flex flex-col space-y-4">
+            <nav className="flex flex-col space-y-3">
               <Link
                 href="/"
-                className="py-2 text-lg font-medium border-b border-gray-100"
+                className="py-1.5 text-base font-medium border-b border-gray-100 flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <Home className="h-4 w-4 text-amber-500" />
                 Home
               </Link>
 
               <Link
                 href="/transport"
-                className="py-2 text-lg font-medium border-b border-gray-100 flex items-center gap-2"
+                className="py-1.5 text-base font-medium border-b border-gray-100 flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                <Car className="h-5 w-5 text-amber-500" />
+                <Car className="h-4 w-4 text-amber-500" />
                 Transport & Taxi
               </Link>
 
@@ -489,21 +483,22 @@ export function SiteHeader() {
                 📸 Photography Tour + Drone
               </Link> */}
 
-              <div className="py-2 border-b border-gray-100">
+              <div className="py-1.5 border-b border-gray-100">
                 <button
-                  className="flex items-center justify-between w-full text-lg font-medium"
+                  className="flex items-center justify-between w-full text-base font-medium"
                   onClick={toggleMobileDesertExpanded}
                 >
                   <div className="flex items-center gap-2">
+                    <Compass className="h-4 w-4 text-amber-500" />
                     <span>Desert Experiences</span>
-                    <span className="inline-block bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded">
+                    <span className="inline-block bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
                       15% OFF
                     </span>
                   </div>
                   {mobileDesertExpanded ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
+                    <ChevronUp className="h-4 w-4 text-gray-500" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
                   )}
                 </button>
 
@@ -511,116 +506,158 @@ export function SiteHeader() {
                   <div className="mt-2 pl-4 flex flex-col space-y-2">
                     <Link
                       href="/desert-experiences/half-day-jeep-tour"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Half Day Jeep Tour
+                      <span>Half Day Jeep Tour</span>
+                      <Truck className="h-4 w-4 text-orange-500" />
                     </Link>
                     <Link
                       href="/desert-experiences/full-day-jeep-tour"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Full Day Jeep Tour
+                      <span>Full Day Jeep Tour</span>
+                      <Car className="h-4 w-4 text-blue-500" />
                     </Link>
                     <Link
                       href="/desert-experiences/two-hour-jeep-tour"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      2 Hours Jeep Tour
+                      <span>2 Hours Jeep Tour</span>
+                      <CarFront className="h-4 w-4 text-green-500" />
                     </Link>
                     <Link
                       href="/desert-experiences/the-beduin-way"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      The Beduin Way
+                      <span>The Beduin Way</span>
+                      <div className="flex gap-1">
+                        <Tent className="h-4 w-4 text-amber-600" />
+                        <Coffee className="h-4 w-4 text-amber-700" />
+                      </div>
                     </Link>
                     <Link
                       href="/desert-experiences/jebel-khash-route"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Jebel Khash Route
+                      <span>Jebel Khash Route</span>
+                      <div className="flex gap-1">
+                        <Mountain className="h-4 w-4 text-slate-600" />
+                        <Car className="h-4 w-4 text-blue-500" />
+                      </div>
                     </Link>
                     <Link
                       href="/desert-experiences/jebel-khash-2"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Jebel Khash 2-Day
+                      <span>Jebel Khash 2-Day</span>
+                      <div className="flex gap-1">
+                        <MountainSnow className="h-4 w-4 text-blue-600" />
+                        <Backpack className="h-4 w-4 text-green-600" />
+                      </div>
                     </Link>
                     <Link
                       href="/desert-experiences/hot-air-balloon"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Hot Air Balloon
+                      <span>Hot Air Balloon</span>
+                      <Wind className="h-4 w-4 text-sky-500" />
                     </Link>
                     <Link
                       href="/desert-experiences/jebel-burdah-climbing"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Burdah Arch Scrambling
+                      <span>Burdah Arch Scrambling</span>
+                      <Mountain className="h-4 w-4 text-red-600" />
                     </Link>
                     <Link
                       href="/desert-experiences/all-in-one-day"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      All in One Day
+                      <span>All in One Day</span>
+                      <div className="flex gap-1">
+                        <Car className="h-4 w-4 text-blue-500" />
+                        <Mountain className="h-4 w-4 text-slate-600" />
+                        <Trees className="h-4 w-4 text-green-600" />
+                      </div>
                     </Link>
                     <Link
                       href="/desert-experiences/um-addami-climbing"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Jebel Um Addami Climbing
+                      <span>Jebel Um Addami Climbing</span>
+                      <div className="flex gap-1">
+                        <Mountain className="h-4 w-4 text-purple-600" />
+                        <MountainSnow className="h-4 w-4 text-indigo-600" />
+                      </div>
                     </Link>
                     <Link
                       href="/desert-experiences/camel-rides"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Camel Rides
+                      <span>Camel Rides</span>
+                      <Sunrise className="h-4 w-4 text-orange-500" />
                     </Link>
                     <Link
                       href="/desert-experiences/trekking"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Trekking in the Wild
+                      <span>Trekking in the Wild</span>
+                      <div className="flex gap-1">
+                        <Footprints className="h-4 w-4 text-amber-600" />
+                        <Mountain className="h-4 w-4 text-slate-600" />
+                      </div>
                     </Link>
                     <Link
                       href="/desert-experiences/night-walk-tour"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Night Walk Tour
+                      <span>Night Walk Tour</span>
+                      <div className="flex gap-1">
+                        <Moon className="h-4 w-4 text-indigo-600" />
+                        <Footprints className="h-4 w-4 text-amber-600" />
+                      </div>
                     </Link>
                     <Link
                       href="/desert-experiences/stargazing-education"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Stargazing Education
+                      <span>Stargazing Education</span>
+                      <div className="flex gap-1">
+                        <Star className="h-4 w-4 text-yellow-500" />
+                        <Moon className="h-4 w-4 text-indigo-600" />
+                      </div>
                     </Link>
                   </div>
                 )}
               </div>
 
-              <div className="py-2 border-b border-gray-100">
+              <div className="py-1.5 border-b border-gray-100">
                 <button
-                  className="flex items-center justify-between w-full text-lg font-medium"
+                  className="flex items-center justify-between w-full text-base font-medium"
                   onClick={toggleMobilePackagesExpanded}
                 >
-                  <span>Packages</span>
+                  <div className="flex items-center gap-2">
+                    <Package className="h-4 w-4 text-amber-500" />
+                    <span>Packages</span>
+                  </div>
                   {mobilePackagesExpanded ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
+                    <ChevronUp className="h-4 w-4 text-gray-500" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
                   )}
                 </button>
 
@@ -628,69 +665,104 @@ export function SiteHeader() {
                   <div className="mt-2 pl-4 flex flex-col space-y-2">
                     <Link
                       href="/packages/bivouac"
-                      className="text-gray-600 font-medium"
+                      className="text-gray-600 font-medium flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Bivouac Camping Package
+                      <span>Bivouac Camping Package</span>
+                      <div className="flex gap-1">
+                        <Tent className="h-4 w-4 text-amber-600" />
+                        <Star className="h-4 w-4 text-yellow-500" />
+                      </div>
                     </Link>
                     <div className="font-medium text-gray-800 mt-3 mb-1">2-Day Packages</div>
                     <Link
                       href="/packages/classic-adventure"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Classic Adventure
+                      <span>Classic Adventure</span>
+                      <div className="flex gap-1">
+                        <Car className="h-4 w-4 text-blue-500" />
+                        <Mountain className="h-4 w-4 text-slate-600" />
+                      </div>
                     </Link>
                     <Link
                       href="/packages/desert-explorer"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Desert Explorer
+                      <span>Desert Explorer</span>
+                      <div className="flex gap-1">
+                        <Car className="h-4 w-4 text-blue-500" />
+                        <Compass className="h-4 w-4 text-red-500" />
+                        <Mountain className="h-4 w-4 text-slate-600" />
+                      </div>
                     </Link>
                     <Link
                       href="/packages/bedouin-experience"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Bedouin Experience
+                      <span>Bedouin Experience</span>
+                      <div className="flex gap-1">
+                        <Tent className="h-4 w-4 text-amber-600" />
+                        <Coffee className="h-4 w-4 text-amber-700" />
+                      </div>
                     </Link>
                     <div className="font-medium text-gray-800 mt-2 mb-1">3-Day Packages</div>
                     <Link
                       href="/packages/wadi-rum-discovery"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Wadi Rum Discovery
+                      <span>Wadi Rum Discovery</span>
+                      <div className="flex gap-1">
+                        <Car className="h-4 w-4 text-blue-500" />
+                        <Mountain className="h-4 w-4 text-slate-600" />
+                        <Tent className="h-4 w-4 text-amber-600" />
+                        <Trees className="h-4 w-4 text-green-600" />
+                      </div>
                     </Link>
                     <Link
                       href="/packages/ultimate-adventure"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Ultimate Adventure
+                      <span>Ultimate Adventure</span>
+                      <div className="flex gap-1">
+                        <MountainSnow className="h-4 w-4 text-blue-600" />
+                        <Backpack className="h-4 w-4 text-green-600" />
+                        <Car className="h-4 w-4 text-blue-500" />
+                      </div>
                     </Link>
                     <Link
                       href="/packages/jordan-heights"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Jordan Heights
+                      <span>Jordan Heights</span>
+                      <div className="flex gap-1">
+                        <Mountain className="h-4 w-4 text-purple-600" />
+                        <MountainSnow className="h-4 w-4 text-indigo-600" />
+                      </div>
                     </Link>
                   </div>
                 )}
               </div>
 
-              <div className="py-2 border-b border-gray-100">
+              <div className="py-1.5 border-b border-gray-100">
                 <button
-                  className="flex items-center justify-between w-full text-lg font-medium"
+                  className="flex items-center justify-between w-full text-base font-medium"
                   onClick={toggleMobileAccommodationExpanded}
                 >
-                  <span>Accommodation</span>
+                  <div className="flex items-center gap-2">
+                    <Tent className="h-4 w-4 text-amber-500" />
+                    <span>Accommodation</span>
+                  </div>
                   {mobileAccommodationExpanded ? (
-                    <ChevronUp className="h-5 w-5 text-gray-500" />
+                    <ChevronUp className="h-4 w-4 text-gray-500" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-gray-500" />
+                    <ChevronDown className="h-4 w-4 text-gray-500" />
                   )}
                 </button>
 
@@ -698,17 +770,25 @@ export function SiteHeader() {
                   <div className="mt-2 pl-4 flex flex-col space-y-2">
                     <Link
                       href="/accommodation/our-tented-camp"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Our Tented Camp
+                      <span>Our Tented Camp</span>
+                      <div className="flex gap-1">
+                        <Tent className="h-4 w-4 text-amber-600" />
+                        <Bed className="h-4 w-4 text-blue-500" />
+                      </div>
                     </Link>
                     <Link
                       href="/accommodation/bivouac"
-                      className="text-gray-600"
+                      className="text-gray-600 flex justify-between items-center"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Bivouac Camping
+                      <span>Bivouac Camping</span>
+                      <div className="flex gap-1">
+                        <Star className="h-4 w-4 text-yellow-500" />
+                        <Moon className="h-4 w-4 text-indigo-600" />
+                      </div>
                     </Link>
                   </div>
                 )}
@@ -716,59 +796,57 @@ export function SiteHeader() {
 
               <Link
                 href="/bubble-camp-partner"
-                className="py-2 text-lg font-medium border-b border-gray-100"
+                className="py-1.5 text-base font-medium border-b border-gray-100 flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <Droplets className="h-4 w-4 text-amber-500" />
                 Bubble Camp Partner
               </Link>
 
               <Link
                 href="https://www.thevillas-wadirum.com/"
-                className="py-2 text-lg font-medium border-b border-gray-100"
+                className="py-1.5 text-base font-medium border-b border-gray-100 flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
                 target="_blank"
                 rel="noopener noreferrer"
               >
+                <Castle className="h-4 w-4 text-amber-500" />
                 Luxury Villas Partner
               </Link>
 
               <Link
-                href="/about-us"
-                className="py-2 text-lg font-medium border-b border-gray-100"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                About Us
-              </Link>
-
-              <Link
                 href="/contact-us"
-                className="py-2 text-lg font-medium border-b border-gray-100"
+                className="py-1.5 text-base font-medium border-b border-gray-100 flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <Phone className="h-4 w-4 text-amber-500" />
                 Contact us
               </Link>
 
               <Link
                 href="/useful-information"
-                className="py-2 text-lg font-medium border-b border-gray-100"
+                className="py-1.5 text-base font-medium border-b border-gray-100 flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <Lightbulb className="h-4 w-4 text-amber-500" />
                 Useful Information
               </Link>
 
               <Link
                 href="/faq"
-                className="py-2 text-lg font-medium border-b border-gray-100"
+                className="py-1.5 text-base font-medium border-b border-gray-100 flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <HelpCircle className="h-4 w-4 text-amber-500" />
                 FAQ
               </Link>
 
               <Link
                 href="/blog"
-                className="py-2 text-lg font-medium border-b border-gray-100"
+                className="py-1.5 text-base font-medium border-b border-gray-100 flex items-center gap-2"
                 onClick={() => setMobileMenuOpen(false)}
               >
+                <BookOpen className="h-4 w-4 text-amber-500" />
                 Blog
               </Link>
 

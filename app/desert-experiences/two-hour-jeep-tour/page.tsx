@@ -5,6 +5,7 @@ import { FAQSection } from "@/components/faq-section"
 import { desertExperienceFaqs } from "@/data/desert-experience-faqs"
 import { TourCard } from "@/components/tour-card"
 import { ImageLightbox } from "@/components/image-lightbox"
+import { FloatingBookButton } from "@/components/floating-book-button"
 
 export const metadata: Metadata = {
   title: "2 Hours Jeep Tour | Wadi Rum Desert Experiences",
@@ -15,6 +16,7 @@ export const metadata: Metadata = {
 export default function TwoHourJeepTourPage() {
   return (
     <div className="bg-white">
+      <FloatingBookButton />
       {/* Hero Section */}
       <div className="relative h-[50vh] md:h-[60vh] lg:h-[70vh] w-full">
         <Image
