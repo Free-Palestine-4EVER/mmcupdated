@@ -554,7 +554,21 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
       ...formData,
       tours: selectedTours.map((tourId) => {
         const tour = tourOptions.find((option) => option.id === tourId)
-        return tour ? tour.name : tourId
+        if (!tour) return { name: tourId, price: 0 }
+
+        // Calculate price for this tour based on number of people
+        let tourPrice = 0
+        if (tour.id === "stargazing") {
+          tourPrice = calculateStargazingPrice(formData.numPeople)
+        } else {
+          tourPrice = getTourPrice(tour, formData.numPeople)
+        }
+
+        return {
+          name: tour.name,
+          price: tourPrice,
+          totalPrice: tourPrice * formData.numPeople
+        }
       }),
       packageDetails: selectedPackage
         ? {

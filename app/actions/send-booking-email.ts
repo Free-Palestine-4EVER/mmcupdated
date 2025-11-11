@@ -95,8 +95,9 @@ DESERT EXPERIENCE TOURS
         emailText += `
 Tour ${index + 1}:
 - Name: ${tour.name || "N/A"}
-- Price: ${tour.price || "N/A"} JOD
-- Number of People: ${formData.numPeople || "N/A"}`
+- Price per person: ${tour.price || "N/A"} JOD
+- Number of people: ${formData.numPeople || "N/A"}
+- Total for this tour: ${tour.totalPrice || (tour.price * formData.numPeople) || "N/A"} JOD`
       })
     } else {
       emailText += "\nNo additional tours selected"
