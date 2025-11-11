@@ -335,6 +335,13 @@ export function SiteHeader() {
                 </ul>
               </NavigationMenuContent>
             </NavigationMenuItem>
+            {/* <NavigationMenuItem>
+              <Link href="/photography-drone-tour" legacyBehavior passHref>
+                <NavigationMenuLink className="relative text-sm font-bold bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 py-2 rounded-full transition-all hover:from-amber-600 hover:to-orange-700 hover:scale-105 shadow-lg hover:shadow-xl focus:outline-none">
+                  📸 Photography + Drone
+                </NavigationMenuLink>
+              </Link>
+            </NavigationMenuItem> */}
             <NavigationMenuItem>
               <Link href="/bubble-camp-partner" legacyBehavior passHref>
                 <NavigationMenuLink className="text-sm font-medium transition-colors hover:text-amber-500 focus:outline-none">
@@ -457,6 +464,14 @@ export function SiteHeader() {
               >
                 Home
               </Link>
+
+              {/* <Link
+                href="/photography-drone-tour"
+                className="relative py-3 text-lg font-bold bg-gradient-to-r from-amber-500 to-orange-600 text-white px-4 rounded-lg shadow-lg border-0 text-center animate-pulse"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                📸 Photography Tour + Drone
+              </Link> */}
 
               <div className="py-2 border-b border-gray-100">
                 <button
