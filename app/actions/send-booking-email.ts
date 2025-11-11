@@ -58,51 +58,88 @@ export async function sendBookingEmail(formData: any) {
         })
       : "Not specified"
 
+    // Log all form data to see what we're receiving
+    console.log("Full form data received:", JSON.stringify(formData, null, 2))
+
     // Build plain text email with ALL details
-    const emailText = `
+    let emailText = `
 NEW BOOKING REQUEST
 
-CUSTOMER INFORMATION:
-Name: ${formData.name}
-Email: ${formData.email}
-Phone: ${formData.phone}
-Number of People: ${formData.numPeople}
+========================================
+CUSTOMER INFORMATION
+========================================
+Name: ${formData.name || "N/A"}
+Email: ${formData.email || "N/A"}
+Phone: ${formData.phone || "N/A"}
+Number of People: ${formData.numPeople || "N/A"}
 Arrival Date: ${formattedDate}
 
-BOOKING DETAILS:
-${formData.package ? `Package: ${formData.package}` : "No package selected"}
-${formData.accommodation ? `Accommodation: ${formData.accommodation}` : "No accommodation selected"}
+========================================
+BOOKING DETAILS
+========================================
+Package Selected: ${formData.package || "No package selected"}
+Accommodation: ${formData.accommodation || "No accommodation selected"}
 
-DESERT EXPERIENCE TOURS:
-${
-  formData.tours && formData.tours.length > 0
-    ? formData.tours.map((tour: any) => `- ${tour.name} (${tour.price} JOD for ${formData.numPeople} people)`).join("\n")
-    : "No tours selected"
-}
+Package Details:
+${formData.packageDetails ? `- Name: ${formData.packageDetails.name || "N/A"}
+- Duration: ${formData.packageDetails.duration || "N/A"}
+- Price: ${formData.packageDetails.price || "N/A"} JOD
+- Includes: ${formData.packageDetails.includes ? formData.packageDetails.includes.join(", ") : "N/A"}` : "No package details"}
 
-HOT AIR BALLOON:
-${formData.hotAirBalloon ? `Yes - Included in booking` : "No"}
+========================================
+DESERT EXPERIENCE TOURS
+========================================`
 
-TRANSPORT:
-Transport Needed: ${formData.transportNeeded ? "Yes" : "No"}
-${formData.transportRoute ? `Route: ${formData.transportRoute}` : ""}
-${formData.transportDetails ? `Details: ${formData.transportDetails}` : ""}
+    if (formData.tours && formData.tours.length > 0) {
+      formData.tours.forEach((tour: any, index: number) => {
+        emailText += `
+Tour ${index + 1}:
+- Name: ${tour.name || "N/A"}
+- Price: ${tour.price || "N/A"} JOD
+- Number of People: ${formData.numPeople || "N/A"}`
+      })
+    } else {
+      emailText += "\nNo additional tours selected"
+    }
 
-FOOD PREFERENCES:
-Vegetarian: ${formData.vegetarian ? "Yes" : "No"}
-${formData.foodAllergies ? `Food Allergies: ${formData.foodAllergies}` : "No food allergies"}
+    emailText += `
 
-PRICING:
-Total Price: ${formData.totalPrice} JOD
-${formData.discountAmount ? `Discount: -${formData.discountAmount} JOD` : ""}
-Final Price: ${formData.finalPrice} JOD
+========================================
+HOT AIR BALLOON
+========================================
+${formData.hotAirBalloon ? "YES - Included in booking" : "No"}
 
-SPECIAL REQUESTS:
-${formData.message || "None"}
+========================================
+TRANSPORT / TRANSFER
+========================================
+Transport Needed: ${formData.transportNeeded ? "YES" : "No"}
+Transport Route Selected: ${formData.transportRoute || "Not specified"}
+Transport Details: ${formData.transportDetails || "No additional transport details"}
 
----
+========================================
+FOOD PREFERENCES
+========================================
+Vegetarian: ${formData.vegetarian ? "YES" : "No"}
+Food Allergies: ${formData.foodAllergies || "None specified"}
+
+========================================
+PRICING BREAKDOWN
+========================================
+Total Price (before discount): ${formData.totalPrice || 0} JOD
+Discount Amount: ${formData.discountAmount ? `-${formData.discountAmount} JOD` : "0 JOD"}
+FINAL PRICE: ${formData.finalPrice || formData.totalPrice || 0} JOD
+
+========================================
+SPECIAL REQUESTS / MESSAGE
+========================================
+${formData.message || "No special requests"}
+
+========================================
 This booking was submitted through the Wadi Rum website.
-    `.trim()
+Timestamp: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" })} (Jordan Time)
+`
+
+    emailText = emailText.trim()
 
     console.log("Plain text email prepared")
 
