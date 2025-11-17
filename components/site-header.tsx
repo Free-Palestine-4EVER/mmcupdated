@@ -492,7 +492,7 @@ export function SiteHeader() {
                     <Compass className="h-4 w-4 text-amber-500" />
                     <span>Desert Experiences</span>
                     <span className="inline-block bg-red-500 text-white text-xs font-bold px-1.5 py-0.5 rounded">
-                      15% OFF
+                      10% OFF
                     </span>
                   </div>
                   {mobileDesertExpanded ? (

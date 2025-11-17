@@ -54,7 +54,7 @@ export function DiscountModal() {
                 <div className="absolute inset-0 animate-ping rounded-2xl bg-white opacity-20" style={{ animationDuration: '2s' }} />
                 <div className="relative flex h-16 w-28 sm:h-28 sm:w-40 items-center justify-center rounded-2xl bg-white shadow-2xl">
                   <div className="text-center">
-                    <div className="text-3xl sm:text-5xl font-black text-orange-600">15%</div>
+                    <div className="text-3xl sm:text-5xl font-black text-orange-600">10%</div>
                     <div className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-orange-500">OFF</div>
                   </div>
                 </div>
@@ -77,7 +77,7 @@ export function DiscountModal() {
                 </div>
                 <div>
                   <h3 className="mb-0.5 sm:mb-1 text-base sm:text-xl font-bold text-gray-900">
-                    15% Off All Desert Activities
+                    10% Off All Desert Activities
                   </h3>
                   <p className="text-[11px] sm:text-sm text-gray-600 leading-tight sm:leading-relaxed">
                     Experience authentic Bedouin adventures with exclusive savings on all tours and activities
@@ -134,7 +134,7 @@ export function DiscountModal() {
                 }}
                 className="flex-1 h-10 sm:h-12 bg-white text-orange-600 font-bold text-sm sm:text-base shadow-lg hover:bg-gray-50 hover:shadow-xl transition-all duration-200 hover:scale-105"
               >
-                Book Now & Save 15%
+                Book Now & Save 10%
               </Button>
               <Button
                 variant="ghost"

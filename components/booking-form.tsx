@@ -423,7 +423,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
   const [totalPrice, setTotalPrice] = useState(0)
   const [discountedPrice, setDiscountedPrice] = useState(0)
   const [submitted, setSubmitted] = useState(false)
-  const DISCOUNT_PERCENTAGE = 0.15 // 15% discount
+  const DISCOUNT_PERCENTAGE = 0.10 // 10% discount
 
   // Initialize selected tours if tourName is provided
   useEffect(() => {
@@ -458,7 +458,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
 
     // Check if any selected tour qualifies for free tented camp accommodation
     const qualifiesForFreeTentedCamp = selectedTours.some((tourId) => {
-      return tourId !== "sandboarding" && tourId !== "camel-rides" && tourId !== "hot-air-balloon"
+      return tourId !== "sandboarding" && tourId !== "camel-rides" && tourId !== "hot-air-balloon" && tourId !== "two-hour-jeep"
     })
 
     // Add accommodation price (free tented camp if qualifying tour is selected) - only if no package or "no-package" selected
@@ -793,7 +793,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               {accommodationOptions.map((option) => {
                 // Check if any selected tour qualifies for free tented camp
                 const qualifiesForFreeTentedCamp = selectedTours.some((tourId) => {
-                  return tourId !== "sandboarding" && tourId !== "camel-rides" && tourId !== "hot-air-balloon"
+                  return tourId !== "sandboarding" && tourId !== "camel-rides" && tourId !== "hot-air-balloon" && tourId !== "two-hour-jeep"
                 })
 
                 // Show "FREE" for tented camp if qualifying tour is selected
@@ -817,7 +817,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
         <h3 className="text-xl font-semibold">Desert Experiences</h3>
         {formData.package && formData.package !== "no-package" && (
           <p className="text-sm text-amber-700 bg-amber-50 p-3 rounded-md border border-amber-200">
-            Note: Your selected package already includes tours. You can add additional tours below, and they will be calculated with a 15% discount applied to the tour prices.
+            Note: Your selected package already includes tours. You can add additional tours below, and they will be calculated with a 10% discount applied to the tour prices.
           </p>
         )}
         <div className="space-y-4">
@@ -835,7 +835,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               <SelectTrigger id="tourSelect" className="w-full">
                 <SelectValue placeholder="Select a tour to add" />
               </SelectTrigger>
-              <SelectContent className="max-h-[400px] overflow-y-auto">
+              <SelectContent className="max-h-none overflow-visible">
                 <SelectItem value="no-tour" className="text-xs">No tour needed</SelectItem>
                 {tourOptions.map((tour) => {
                   let priceDisplay = ""
@@ -1102,7 +1102,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
 
                   // Check if any selected tour qualifies for free tented camp
                   const qualifiesForFreeTentedCamp = selectedTours.some((tourId) => {
-                    return tourId !== "sandboarding" && tourId !== "camel-rides" && tourId !== "hot-air-balloon"
+                    return tourId !== "sandboarding" && tourId !== "camel-rides" && tourId !== "hot-air-balloon" && tourId !== "two-hour-jeep"
                   })
 
                   if (qualifiesForFreeTentedCamp && formData.accommodation === "tented-camp") {
@@ -1179,7 +1179,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               </div>
 
               <div className="flex justify-between pt-2 text-green-600">
-                <span className="text-base font-semibold">Tour Discount (15%):</span>
+                <span className="text-base font-semibold">Tour Discount (10%):</span>
                 <span className="text-base font-semibold">-{(totalPrice - discountedPrice).toFixed(2)} JOD</span>
               </div>
 
@@ -1190,7 +1190,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
 
               <div className="mt-3 p-2 bg-red-50 border border-red-200 rounded">
                 <p className="text-sm text-center">
-                  <span className="font-bold text-red-600">15% DISCOUNT APPLIED TO TOURS!</span>
+                  <span className="font-bold text-red-600">10% DISCOUNT APPLIED TO TOURS!</span>
                 </p>
               </div>
             </>

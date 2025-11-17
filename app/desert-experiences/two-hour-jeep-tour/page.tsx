@@ -136,7 +136,11 @@ export default function TwoHourJeepTourPage() {
               <li>Light jacket or sweater (if touring in cooler months)</li>
             </ul>
 
-            <div className="bg-amber-50 p-6 rounded-lg mb-8">
+            <div className="bg-red-50 border-2 border-red-200 p-6 rounded-lg mb-8">
+              <div className="bg-red-100 text-red-800 px-4 py-2 rounded-md mb-4 text-center">
+                <p className="font-bold text-lg">⚠️ TOUR ONLY - NO ACCOMMODATION INCLUDED</p>
+                <p className="text-sm">This is a standalone tour, not a package. Accommodation and meals are NOT included.</p>
+              </div>
               <h3 className="text-xl font-bold mb-4 text-amber-600">Tour Details</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -155,6 +159,9 @@ export default function TwoHourJeepTourPage() {
 
                   <p className="font-semibold mb-1">Includes:</p>
                   <p className="text-gray-700 mb-4">Transportation in 4x4 jeep, Bedouin guide</p>
+
+                  <p className="font-semibold mb-1">Not Included:</p>
+                  <p className="text-gray-700 mb-4 font-bold text-red-600">Accommodation, meals, and transfers</p>
 
                   <p className="font-semibold mb-1">Languages:</p>
                   <p className="text-gray-700">English, Arabic</p>
