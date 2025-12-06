@@ -63,32 +63,33 @@ export async function sendBookingEmail(formData: any) {
 
     // Build plain text email with ALL details
     let emailText = `
-NEW BOOKING REQUEST
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                         🌙 NEW BOOKING REQUEST 🌙
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-========================================
-CUSTOMER INFORMATION
-========================================
-Name: ${formData.name || "N/A"}
-Email: ${formData.email || "N/A"}
-Phone: ${formData.phone || "N/A"}
-Number of People: ${formData.numPeople || "N/A"}
-Arrival Date: ${formattedDate}
+👤 CUSTOMER INFORMATION
+─────────────────────────────────────────
+Name:              ${formData.name || "N/A"}
+Email:             ${formData.email || "N/A"}
+Phone:             ${formData.phone || "N/A"}
+Number of People:  ${formData.numPeople || "N/A"}
+Arrival Date:      ${formattedDate}
 
-========================================
-BOOKING DETAILS
-========================================
-Package Selected: ${formData.package || "No package selected"}
-Accommodation: ${formData.accommodation || "No accommodation selected"}
+
+📋 BOOKING DETAILS
+─────────────────────────────────────────
+Package:           ${formData.package || "No package selected"}
+Accommodation:     ${formData.accommodation || "No accommodation selected"}
 
 Package Details:
-${formData.packageDetails ? `- Name: ${formData.packageDetails.name || "N/A"}
-- Duration: ${formData.packageDetails.duration || "N/A"}
-- Price: ${formData.packageDetails.price || "N/A"} JOD
-- Includes: ${formData.packageDetails.includes ? formData.packageDetails.includes.join(", ") : "N/A"}` : "No package details"}
+${formData.packageDetails ? `  • Name:     ${formData.packageDetails.name || "N/A"}
+  • Duration: ${formData.packageDetails.duration || "N/A"}
+  • Price:    ${formData.packageDetails.price || "N/A"} JOD
+  • Includes: ${formData.packageDetails.includes ? formData.packageDetails.includes.join(", ") : "N/A"}` : "  No package details"}
 
-========================================
-DESERT EXPERIENCE TOURS
-========================================`
+
+🏜️ DESERT EXPERIENCE TOURS
+─────────────────────────────────────────`
 
     if (formData.tours && formData.tours.length > 0) {
       formData.tours.forEach((tour: any, index: number) => {
@@ -102,45 +103,48 @@ DESERT EXPERIENCE TOURS
 
         emailText += `
 Tour ${index + 1}:
-- Name: ${tourName}
-- Price per person: ${pricePerPerson} JOD
-- Number of people: ${formData.numPeople || "N/A"}
-- Total for this tour: ${totalForTour} JOD`
+  • Tour Name:        ${tourName}
+  • Price per person: ${pricePerPerson} JOD
+  • Number of people: ${formData.numPeople || "N/A"}
+  • Tour Total:       ${totalForTour} JOD`
       })
     } else {
-      emailText += "\nNo additional tours selected"
+      emailText += "\n  No additional tours selected"
     }
 
     emailText += `
 
-========================================
-TRANSPORT / TRANSFER
-========================================
-Transport Needed: ${formData.transportNeeded ? "YES" : "No"}
-Transport Route Selected: ${formData.transportRoute || "Not specified"}
-Transport Details: ${formData.transportDetails || "No additional transport details"}
 
-========================================
-FOOD PREFERENCES
-========================================
-Vegetarian: ${formData.vegetarian ? "YES" : "No"}
-Food Allergies: ${formData.foodAllergies || "None specified"}
+🚗 TRANSPORT / TRANSFER
+─────────────────────────────────────────
+Transport Needed:  ${formData.transportNeeded ? "YES" : "No"}
+Route Selected:    ${formData.transportRoute || "Not specified"}
+Details:           ${formData.transportDetails || "No additional transport details"}
 
-========================================
-PRICING BREAKDOWN
-========================================
-Total Price (before discount): ${formData.totalPrice || 0} JOD
-Discount Amount: ${formData.discountAmount ? `-${formData.discountAmount} JOD` : "0 JOD"}
-FINAL PRICE: ${formData.finalPrice || formData.totalPrice || 0} JOD
 
-========================================
-SPECIAL REQUESTS / MESSAGE
-========================================
+🍽️ FOOD PREFERENCES
+─────────────────────────────────────────
+Vegetarian:        ${formData.vegetarian ? "YES" : "No"}
+Food Allergies:    ${formData.foodAllergies || "None specified"}
+
+
+💰 PRICING BREAKDOWN
+─────────────────────────────────────────
+Subtotal (before discount):  ${formData.totalPrice || 0} JOD
+Discount Amount:             ${formData.discountAmount ? `-${formData.discountAmount} JOD` : "0 JOD"}
+───────────────────────────────────────────────────
+FINAL PRICE:                 ${formData.finalPrice || formData.totalPrice || 0} JOD
+
+
+📝 SPECIAL REQUESTS / MESSAGE
+─────────────────────────────────────────
 ${formData.message || "No special requests"}
 
-========================================
-This booking was submitted through the Wadi Rum website.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Submitted via: Wadi Rum Website
 Timestamp: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" })} (Jordan Time)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
     emailText = emailText.trim()
