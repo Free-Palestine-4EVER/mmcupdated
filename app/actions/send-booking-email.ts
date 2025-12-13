@@ -301,7 +301,7 @@ Timestamp: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" })} (Jo
     console.log("Sending notification email to admin: mohammed.mutlak.camp@gmail.com")
 
     const adminResult = await emailService.emails.send({
-      from: "Wadi Rum Booking System <onboarding@resend.dev>",
+      from: "Wadi Rum Booking System <reservations@wadirum.org>",
       to: "mohammed.mutlak.camp@gmail.com",
       subject: `🌙 New Booking from ${formData.name} - ${formData.finalPrice || formData.totalPrice || 0} JOD`,
       html: emailHTML,
@@ -340,7 +340,7 @@ Timestamp: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" })} (Jo
         )
 
         const clientResult = await emailService.emails.send({
-          from: "Wadi Rum <onboarding@resend.dev>", // Using the working sender for now
+          from: "Wadi Rum <reservations@wadirum.org>",
           to: formData.email,
           subject: `Booking Confirmation – Wadi Rum Desert Experience 🏜️`,
           html: clientEmailHtml,
