@@ -315,49 +315,7 @@ Timestamp: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" })} (Jo
 
     console.log("Admin email sent successfully with ID:", adminResult.data?.id)
 
-    // --- NEW: Send Confirmation Email to Client ---
-    if (formData.email) {
-      console.log(`Preparing client confirmation email for: ${formData.email}`)
-
-      try {
-        const clientEmailHtml = await render(
-          ClientConfirmationEmail({
-            customerName: formData.name || "Guest",
-            arrivalDate: formattedDate,
-            numPeople: Number(formData.numPeople) || 1,
-            accommodation: formData.accommodation || undefined,
-            tours: Array.isArray(formData.tours) ? formData.tours.map((t: any) => t.name || t) : [],
-            packageName: formData.package === "No package selected" ? undefined : formData.package,
-            packageDuration: formData.packageDetails?.duration,
-            packageIncludes: formData.packageDetails?.includes,
-            finalPrice: Number(formData.finalPrice) || Number(formData.totalPrice) || 0,
-            transportNeeded: formData.transportNeeded,
-            transportDetails: formData.transportDetails,
-            vegetarian: formData.vegetarian,
-            foodAllergies: formData.foodAllergies,
-            specialRequests: formData.message,
-          })
-        )
-
-        const clientResult = await emailService.emails.send({
-          from: "Wadi Rum <reservations@wadirum.org>",
-          to: formData.email,
-          subject: `Booking Confirmation – Wadi Rum Desert Experience 🏜️`,
-          html: clientEmailHtml,
-          text: `Dear ${formData.name},\n\nThank you for booking with us. Your booking is confirmed.\n\nArrival: ${formattedDate}\nTotal: ${formData.finalPrice || formData.totalPrice} JOD\n\nSee you soon!`,
-        })
-
-        if (clientResult.error) {
-          console.error("Error sending client email:", clientResult.error)
-          // We don't fail the whole request if client email fails, but we log it
-        } else {
-          console.log("Client email sent successfully with ID:", clientResult.data?.id)
-        }
-
-      } catch (clientEmailError) {
-        console.error("Error rendering/sending client email:", clientEmailError)
-      }
-    }
+    // Client confirmation handled by n8n triggered by admin email
 
     return { success: true, data: adminResult.data }
   } catch (error: any) {
