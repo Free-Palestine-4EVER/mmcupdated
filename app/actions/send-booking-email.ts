@@ -53,11 +53,11 @@ export async function sendBookingEmail(formData: any) {
     // Format the date
     const formattedDate = formData.date
       ? new Date(formData.date).toLocaleDateString("en-US", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
       : "Not specified"
 
     // Log all form data to see what we're receiving
@@ -340,18 +340,18 @@ Timestamp: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" })} (Jo
         )
 
         const clientResult = await emailService.emails.send({
-          from: "Wadi Rum <reservations@wadirum.org>", // Update this if needed, or use a verified domain
+          from: "Wadi Rum <onboarding@resend.dev>", // Using the working sender for now
           to: formData.email,
           subject: `Booking Confirmation – Wadi Rum Desert Experience 🏜️`,
           html: clientEmailHtml,
-          text: `Dear ${formData.name},\n\nThank you for booking with us. Your booking is confirmed.\n\nArrival: ${formattedDate}\nTotal: ${formData.finalPrice || formData.totalPrice} JOD\n\nSee you soon!`, 
+          text: `Dear ${formData.name},\n\nThank you for booking with us. Your booking is confirmed.\n\nArrival: ${formattedDate}\nTotal: ${formData.finalPrice || formData.totalPrice} JOD\n\nSee you soon!`,
         })
-        
+
         if (clientResult.error) {
-             console.error("Error sending client email:", clientResult.error)
-             // We don't fail the whole request if client email fails, but we log it
+          console.error("Error sending client email:", clientResult.error)
+          // We don't fail the whole request if client email fails, but we log it
         } else {
-             console.log("Client email sent successfully with ID:", clientResult.data?.id)
+          console.log("Client email sent successfully with ID:", clientResult.data?.id)
         }
 
       } catch (clientEmailError) {
