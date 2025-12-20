@@ -4,451 +4,612 @@ import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { BookingForm } from "@/components/booking-form"
-import { Car, MapPin, Clock, Users, CheckCircle2, ArrowRight, Phone, Calendar, ArrowLeftRight } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import {
+  Car,
+  MapPin,
+  Clock,
+  Users,
+  CheckCircle2,
+  Phone,
+  Calendar,
+  ArrowRight,
+  Shield,
+  Sparkles,
+  ChevronDown,
+  Send
+} from "lucide-react"
+import { sendTransportEmail } from "@/app/actions/send-transport-email"
+
+// Available locations
+const locations = [
+  "Amman",
+  "Aqaba",
+  "Dead Sea",
+  "Petra",
+  "Wadi Musa",
+  "Jerash",
+  "Wadi Rum"
+]
+
+// Route pricing data (24 routes as specified)
+const routePricing: { [key: string]: number } = {
+  "Amman-Aqaba": 110,
+  "Amman-Dead Sea": 35,
+  "Amman-Petra": 85,
+  "Amman-Wadi Musa": 85,
+  "Amman-Jerash": 30,
+  "Amman-Wadi Rum": 95,
+  "Aqaba-Dead Sea": 105,
+  "Aqaba-Petra": 65,
+  "Aqaba-Wadi Musa": 65,
+  "Aqaba-Jerash": 130,
+  "Aqaba-Wadi Rum": 35,
+  "Dead Sea-Petra": 75,
+  "Dead Sea-Wadi Musa": 75,
+  "Dead Sea-Jerash": 55,
+  "Dead Sea-Wadi Rum": 100,
+  "Petra-Aqaba": 65,
+  "Petra-Wadi Musa": 10,
+  "Petra-Jerash": 110,
+  "Petra-Wadi Rum": 45,
+  "Wadi Musa-Aqaba": 65,
+  "Wadi Musa-Jerash": 110,
+  "Wadi Musa-Wadi Rum": 55,
+  "Jerash-Aqaba": 130,
+  "Jerash-Wadi Rum": 120,
+}
+
+// Get price for a route (check both directions)
+function getRoutePrice(from: string, to: string): number | null {
+  if (from === to || !from || !to) return null
+  const key1 = `${from}-${to}`
+  const key2 = `${to}-${from}`
+  return routePricing[key1] ?? routePricing[key2] ?? null
+}
 
 export default function TransportPage() {
-  const routes = [
-    {
-      id: "amman-airport",
-      from: "Amman Airport",
-      to: "Wadi Rum",
-      price: 110,
-      duration: "4 hours",
-      distance: "330 km",
-      description: "Direct transfer from Queen Alia International Airport to Wadi Rum",
-      popular: true,
-    },
-    {
-      id: "amman",
-      from: "Amman",
-      to: "Wadi Rum",
-      price: 90,
-      duration: "4 hours",
-      distance: "320 km",
-      description: "Direct transfer from Amman city to Wadi Rum",
-      popular: true,
-    },
-    {
-      id: "petra",
-      from: "Petra",
-      to: "Wadi Rum",
-      price: 45,
-      duration: "1.5 hours",
-      distance: "100 km",
-      description: "Convenient connection between two UNESCO World Heritage sites",
-      popular: true,
-    },
-    {
-      id: "aqaba",
-      from: "Aqaba",
-      to: "Wadi Rum",
-      price: 25,
-      duration: "1 hour",
-      distance: "60 km",
-      description: "Quick transfer from Aqaba city to Wadi Rum desert",
-      popular: false,
-    },
-    {
-      id: "aqaba-airport",
-      from: "Aqaba Airport",
-      to: "Wadi Rum",
-      price: 35,
-      duration: "1 hour",
-      distance: "65 km",
-      description: "Direct airport pickup from King Hussein International Airport",
-      popular: false,
-    },
-  ]
+  // Pricing calculator state
+  const [fromLocation, setFromLocation] = useState("")
+  const [toLocation, setToLocation] = useState("")
+  const [travelDate, setTravelDate] = useState("")
+  const [passengers, setPassengers] = useState(1)
+  const [showFromDropdown, setShowFromDropdown] = useState(false)
+  const [showToDropdown, setShowToDropdown] = useState(false)
 
-  const [routeDirections, setRouteDirections] = useState<{ [key: string]: boolean }>(
-    routes.reduce((acc, route) => ({ ...acc, [route.id]: false }), {})
-  )
+  // Contact form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    message: ""
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
 
-  const toggleDirection = (routeId: string) => {
-    setRouteDirections(prev => ({ ...prev, [routeId]: !prev[routeId] }))
+  const calculatedPrice = getRoutePrice(fromLocation, toLocation)
+
+  const handleFormSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    setSubmitStatus("idle")
+
+    try {
+      const result = await sendTransportEmail({
+        ...formData,
+        fromLocation,
+        toLocation,
+        travelDate,
+        passengers,
+        price: calculatedPrice
+      })
+
+      if (result.success) {
+        setSubmitStatus("success")
+        setFormData({ name: "", email: "", phone: "", message: "" })
+        setFromLocation("")
+        setToLocation("")
+        setTravelDate("")
+        setPassengers(1)
+      } else {
+        setSubmitStatus("error")
+      }
+    } catch (error) {
+      setSubmitStatus("error")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
-      <section className="relative min-h-[70vh] md:h-[80vh] flex items-center">
+      <section className="relative min-h-[50vh] md:h-[55vh] flex items-center">
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/transport-hero.jpg"
-            alt="Wadi Rum Transport and Taxi Service"
+            alt="Jordan Transport and Taxi Service"
             fill
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/40"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/50 to-black/80"></div>
         </div>
 
-        <div className="container relative z-10">
-          <div className="max-w-3xl">
-            <div className="inline-block mb-6">
-              <div className="flex items-center gap-3 px-5 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full">
-                <Car className="h-4 w-4 text-amber-400" />
-                <span className="text-white text-sm font-medium tracking-wide">Reliable Transport</span>
+        <div className="container relative z-10 text-center">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full mb-4">
+            <Car className="h-4 w-4 text-emerald-400" />
+            <span className="text-white text-sm font-medium">Private Transport Services</span>
+          </div>
+
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 tracking-tight">
+            Jordan Transport <span className="font-light text-emerald-400">& Taxi</span>
+          </h1>
+
+          <p className="text-base md:text-lg text-gray-200 mb-6 max-w-xl mx-auto font-light">
+            Safe, comfortable, and reliable private transfers across Jordan.
+            Fixed prices, professional drivers.
+          </p>
+        </div>
+      </section>
+
+      {/* Pricing Calculator - RIGHT AFTER HERO */}
+      <section id="calculator" className="py-10 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 -mt-12 pt-16 relative z-10">
+        <div className="container max-w-3xl">
+          <div className="text-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-light text-white mb-2">
+              Where to <span className="font-bold text-emerald-400">next?</span>
+            </h2>
+            <p className="text-gray-400 text-sm">Calculate your trip price instantly</p>
+          </div>
+
+          {/* Calculator Card - Compact */}
+          <div className="bg-white rounded-2xl shadow-2xl p-5 md:p-8">
+            {/* From & To Row */}
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              {/* From Location */}
+              <div className="relative">
+                <Label className="text-xs font-medium text-gray-500 mb-1 block">From</Label>
+                <div className="relative">
+                  <div
+                    className="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition-colors bg-gray-50"
+                    onClick={() => { setShowFromDropdown(!showFromDropdown); setShowToDropdown(false); }}
+                  >
+                    <MapPin className="h-4 w-4 text-emerald-600" />
+                    <span className={`text-sm flex-1 ${fromLocation ? "text-slate-900 font-medium" : "text-gray-400"}`}>
+                      {fromLocation || "Select departure"}
+                    </span>
+                    <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showFromDropdown ? "rotate-180" : ""}`} />
+                  </div>
+                  {showFromDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-20 overflow-hidden">
+                      {locations.map((loc) => (
+                        <button
+                          key={loc}
+                          className="w-full px-3 py-2 text-left hover:bg-emerald-50 transition-colors flex items-center gap-2 text-sm"
+                          onClick={() => { setFromLocation(loc); setShowFromDropdown(false); }}
+                        >
+                          <MapPin className="h-3 w-3 text-emerald-500" />
+                          <span className="text-gray-800">{loc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* To Location */}
+              <div className="relative">
+                <Label className="text-xs font-medium text-gray-500 mb-1 block">To</Label>
+                <div className="relative">
+                  <div
+                    className="flex items-center gap-2 px-3 py-2.5 border border-gray-200 rounded-lg cursor-pointer hover:border-emerald-400 transition-colors bg-gray-50"
+                    onClick={() => { setShowToDropdown(!showToDropdown); setShowFromDropdown(false); }}
+                  >
+                    <MapPin className="h-4 w-4 text-amber-600" />
+                    <span className={`text-sm flex-1 ${toLocation ? "text-slate-900 font-medium" : "text-gray-400"}`}>
+                      {toLocation || "Select destination"}
+                    </span>
+                    <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform ${showToDropdown ? "rotate-180" : ""}`} />
+                  </div>
+                  {showToDropdown && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-20 overflow-hidden">
+                      {locations.filter(loc => loc !== fromLocation).map((loc) => (
+                        <button
+                          key={loc}
+                          className="w-full px-3 py-2 text-left hover:bg-emerald-50 transition-colors flex items-center gap-2 text-sm"
+                          onClick={() => { setToLocation(loc); setShowToDropdown(false); }}
+                        >
+                          <MapPin className="h-3 w-3 text-amber-500" />
+                          <span className="text-gray-800">{loc}</span>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight">
-              Wadi Rum Transport<br />
-              <span className="font-light">& Taxi Service</span>
-            </h1>
+            {/* Date & Passengers Row - Compact */}
+            <div className="grid grid-cols-2 gap-4 mb-5">
+              {/* Date Picker */}
+              <div>
+                <Label className="text-xs font-medium text-gray-500 mb-1 block">Date</Label>
+                <div className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 focus-within:border-emerald-400 transition-colors">
+                  <Calendar className="h-4 w-4 text-gray-400" />
+                  <Input
+                    type="date"
+                    value={travelDate}
+                    onChange={(e) => setTravelDate(e.target.value)}
+                    className="border-0 p-0 h-auto text-sm focus-visible:ring-0 focus-visible:ring-offset-0 bg-transparent"
+                    min={new Date().toISOString().split('T')[0]}
+                  />
+                </div>
+              </div>
 
-            <p className="text-xl md:text-2xl text-gray-200 mb-8 font-light leading-relaxed">
-              Safe, comfortable, and reliable transfers to Wadi Rum from Amman, Petra, and Aqaba.
-              Professional drivers with years of experience.
-            </p>
+              {/* Passengers */}
+              <div>
+                <Label className="text-xs font-medium text-gray-500 mb-1 block">Passengers</Label>
+                <div className="flex items-center justify-between px-3 py-1.5 border border-gray-200 rounded-lg bg-gray-50">
+                  <button
+                    className="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-base font-medium transition-colors"
+                    onClick={() => setPassengers(Math.max(1, passengers - 1))}
+                  >
+                    −
+                  </button>
+                  <div className="flex items-center gap-1">
+                    <Users className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm font-semibold text-slate-900">{passengers}</span>
+                  </div>
+                  <button
+                    className="w-7 h-7 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center text-base font-medium transition-colors"
+                    onClick={() => setPassengers(Math.min(7, passengers + 1))}
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
 
-            <div className="flex flex-wrap gap-4">
-              <Link href="#routes">
-                <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-white px-8 py-6 text-base">
-                  View Routes & Prices
-                </Button>
-              </Link>
-              <Link href="#booking">
-                <Button
-                  size="lg"
-                  className="bg-white/20 hover:bg-white/30 text-white border-2 border-white backdrop-blur-sm px-8 py-6 text-base"
-                >
-                  Book Now
-                </Button>
-              </Link>
+            {/* Price Display */}
+            {calculatedPrice !== null ? (
+              <div className="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-4 text-white text-center mb-4">
+                <div className="text-xs font-medium text-emerald-100 mb-1">Price per vehicle</div>
+                <div className="text-4xl font-bold">{calculatedPrice} JOD</div>
+                <div className="text-xs text-emerald-100 mt-1">
+                  {fromLocation} → {toLocation} • Up to 4 passengers
+                </div>
+              </div>
+            ) : fromLocation && toLocation ? (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-center mb-4">
+                <div className="text-amber-700 text-sm">Route not available. Contact us for custom pricing.</div>
+              </div>
+            ) : (
+              <div className="bg-slate-50 rounded-xl p-3 text-center mb-4">
+                <div className="text-gray-500 text-sm">Select departure and destination to see price</div>
+              </div>
+            )}
+
+            <Link href="#booking">
+              <Button
+                size="lg"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-5 text-base rounded-xl"
+              >
+                <Sparkles className="mr-2 h-4 w-4" />
+                Book This Trip
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Intro Text Section */}
+      <section className="py-14 bg-white">
+        <div className="container max-w-4xl text-center">
+          <h2 className="text-2xl md:text-3xl font-light text-slate-900 mb-4">
+            Explore Jordan with <span className="font-bold text-emerald-600">Ease & Comfort</span>
+          </h2>
+          <p className="text-base text-gray-600 leading-relaxed mb-6">
+            Our private transport service connects you to ancient Petra, the stunning Dead Sea, vibrant Amman,
+            and the magnificent Wadi Rum desert. Door-to-door service with experienced, English-speaking drivers.
+          </p>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="flex flex-col items-center p-5 bg-slate-50 rounded-xl">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
+                <Shield className="h-6 w-6 text-emerald-600" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-1 text-sm">Fixed Prices</h3>
+              <p className="text-xs text-gray-600 text-center">No hidden fees. Pay per vehicle.</p>
+            </div>
+            <div className="flex flex-col items-center p-5 bg-slate-50 rounded-xl">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
+                <Car className="h-6 w-6 text-emerald-600" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-1 text-sm">Modern Vehicles</h3>
+              <p className="text-xs text-gray-600 text-center">Air-conditioned & comfortable.</p>
+            </div>
+            <div className="flex flex-col items-center p-5 bg-slate-50 rounded-xl">
+              <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
+                <Clock className="h-6 w-6 text-emerald-600" />
+              </div>
+              <h3 className="font-semibold text-slate-900 mb-1 text-sm">24/7 Available</h3>
+              <p className="text-xs text-gray-600 text-center">Book any time, travel any time.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Quick Info Bar */}
-      <section className="bg-slate-900 border-b border-slate-800">
-        <div className="container py-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-1">24/7</div>
-              <div className="text-sm text-gray-400">Available</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-1">AC</div>
-              <div className="text-sm text-gray-400">Vehicles</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-1">Licensed</div>
-              <div className="text-sm text-gray-400">Drivers</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-1">Fixed</div>
-              <div className="text-sm text-gray-400">Prices</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Routes Section */}
-      <section id="routes" className="py-24 bg-white">
+      {/* All Routes Section */}
+      <section className="py-14 bg-slate-50">
         <div className="container max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-light text-slate-900 mb-4">
-              Routes <span className="font-bold">& Pricing</span>
+          <div className="text-center mb-10">
+            <h2 className="text-2xl md:text-3xl font-light text-slate-900 mb-2">
+              All <span className="font-bold">Routes & Prices</span>
             </h2>
-            <p className="text-lg text-gray-600 mb-3">
-              All prices are per vehicle, not per person.
-            </p>
-            <div className="inline-flex items-center gap-2 bg-blue-50 border border-blue-200 px-4 py-2 rounded-full">
-              <ArrowLeftRight className="h-4 w-4 text-blue-600" />
-              <span className="text-sm text-blue-700 font-medium">Click the swap icon on each route to switch directions</span>
-            </div>
+            <p className="text-gray-600 text-sm">Fixed prices per vehicle (up to 4 passengers)</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {routes.map((route, index) => {
-              const isReversed = routeDirections[route.id]
-              const displayFrom = isReversed ? route.to : route.from
-              const displayTo = isReversed ? route.from : route.to
-
+          <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {Object.entries(routePricing).map(([route, price]) => {
+              const [from, to] = route.split("-")
               return (
                 <div
-                  key={index}
-                  className={`relative bg-white rounded-2xl border-2 p-8 hover:shadow-xl transition-all ${
-                    route.popular ? "border-amber-500 shadow-lg" : "border-gray-200"
-                  }`}
+                  key={route}
+                  className="bg-white rounded-lg p-4 border border-gray-200 hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer"
+                  onClick={() => {
+                    setFromLocation(from);
+                    setToLocation(to);
+                    document.getElementById('calculator')?.scrollIntoView({ behavior: 'smooth' });
+                  }}
                 >
-                  {route.popular && (
-                    <div className="absolute -top-3 left-6 bg-amber-500 text-white px-4 py-1 rounded-full text-sm font-semibold">
-                      Popular Route
-                    </div>
-                  )}
-
-                  <div className="flex items-start justify-between mb-6">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <MapPin className="h-5 w-5 text-amber-500" />
-                        <span className="text-xl font-bold text-slate-900">{displayFrom}</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="flex flex-col items-center">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+                        <div className="w-0.5 h-4 bg-gray-200"></div>
+                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
                       </div>
-                      <div className="flex items-center gap-3 ml-8">
-                        <button
-                          onClick={() => toggleDirection(route.id)}
-                          className="hover:bg-gray-100 rounded-full p-1 transition-colors"
-                          aria-label="Switch direction"
-                        >
-                          <ArrowLeftRight className="h-5 w-5 text-gray-400 hover:text-amber-500" />
-                        </button>
-                        <span className="text-xl font-bold text-slate-900">{displayTo}</span>
+                      <div className="text-xs">
+                        <div className="font-medium text-slate-900">{from}</div>
+                        <div className="font-medium text-slate-900">{to}</div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-3xl font-bold text-amber-600">{route.price}</div>
-                      <div className="text-sm text-gray-600">JOD</div>
+                      <div className="text-lg font-bold text-emerald-600">{price}</div>
+                      <div className="text-xs text-gray-500">JOD</div>
                     </div>
                   </div>
-
-                  <p className="text-gray-600 mb-6">{route.description}</p>
-
-                  <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      <span>{route.duration}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span>{route.distance}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span>Up to 4 passengers</span>
-                    </div>
-                  </div>
-
-                  <Link href="#booking">
-                    <Button className="w-full bg-amber-500 hover:bg-amber-600 flex items-center justify-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      Book Ride Now
-                    </Button>
-                  </Link>
                 </div>
               )
             })}
           </div>
-
-          <div className="mt-12 bg-blue-50 border border-blue-200 rounded-2xl p-6">
-            <h3 className="text-xl font-bold text-slate-900 mb-4">Round Trip Discount</h3>
-            <p className="text-gray-700 mb-4">
-              Book a round trip (to and from Wadi Rum) and save! Round trip price is simply double the one-way price
-              shown above.
-            </p>
-            <p className="text-sm text-gray-600">
-              Example: Amman → Wadi Rum → Amman = 90 JOD × 2 = 180 JOD
-            </p>
-          </div>
         </div>
       </section>
 
-      {/* Why Choose Us Section */}
-      <section className="py-24 bg-slate-50">
-        <div className="container max-w-6xl">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-light text-slate-900 mb-4">
-              Why Choose <span className="font-bold">Our Service?</span>
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-8 border border-gray-200">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
-                <CheckCircle2 className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Professional Drivers</h3>
-              <p className="text-gray-600">
-                All our drivers are licensed, experienced, and speak English. They know the routes and ensure safe,
-                comfortable journeys.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8 border border-gray-200">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
-                <Car className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Modern Vehicles</h3>
-              <p className="text-gray-600">
-                Air-conditioned, clean, and well-maintained vehicles. Comfortable seating for up to 4 passengers with
-                luggage space.
-              </p>
-            </div>
-
-            <div className="bg-white rounded-2xl p-8 border border-gray-200">
-              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-6">
-                <Phone className="h-8 w-8 text-amber-600" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Easy Booking</h3>
-              <p className="text-gray-600">
-                Book online or contact us directly. Flexible pickup times, door-to-door service, and no hidden fees.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Important Information */}
-      <section className="py-24 bg-white">
+      {/* What's Included Section */}
+      <section className="py-14 bg-white">
         <div className="container max-w-4xl">
-          <h2 className="text-4xl md:text-5xl font-light text-slate-900 mb-12 text-center">
-            Important <span className="font-bold">Information</span>
+          <h2 className="text-2xl md:text-3xl font-light text-slate-900 mb-6 text-center">
+            What's <span className="font-bold">Included</span>
           </h2>
 
-          <div className="space-y-6">
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Vehicle Capacity</h3>
-              <p className="text-gray-600">Each vehicle accommodates up to 4 passengers with standard luggage.</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex gap-3 p-4 bg-slate-50 rounded-xl">
+              <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-slate-900 text-sm mb-1">Professional Drivers</h3>
+                <p className="text-gray-600 text-xs">Licensed, experienced, English-speaking.</p>
+              </div>
             </div>
+            <div className="flex gap-3 p-4 bg-slate-50 rounded-xl">
+              <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-slate-900 text-sm mb-1">Air-Conditioned Vehicles</h3>
+                <p className="text-gray-600 text-xs">Modern, clean, and comfortable.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 p-4 bg-slate-50 rounded-xl">
+              <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-slate-900 text-sm mb-1">Door-to-Door Service</h3>
+                <p className="text-gray-600 text-xs">Pickup at your hotel or accommodation.</p>
+              </div>
+            </div>
+            <div className="flex gap-3 p-4 bg-slate-50 rounded-xl">
+              <CheckCircle2 className="h-5 w-5 text-emerald-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-slate-900 text-sm mb-1">Free Waiting Time</h3>
+                <p className="text-gray-600 text-xs">Up to 1 hour for airport pickups.</p>
+              </div>
+            </div>
+          </div>
 
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Booking Confirmation</h3>
-              <p className="text-gray-600">
-                Please book at least 24 hours in advance. Provide your pickup location, date, time, and number of
-                passengers.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Payment</h3>
-              <p className="text-gray-600">
-                Payment can be made in cash to the driver (Jordanian Dinar or USD accepted). Prices are fixed - no
-                hidden fees.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Waiting Time</h3>
-              <p className="text-gray-600">
-                For airport pickups, drivers will wait up to 1 hour after scheduled pickup time at no extra charge.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Luggage</h3>
-              <p className="text-gray-600">
-                Standard luggage included. For oversized items or extra luggage, please mention when booking.
-              </p>
-            </div>
-
-            <div className="bg-gray-50 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-2">Child Seats</h3>
-              <p className="text-gray-600">
-                Child seats available upon request. Please specify age of children when booking.
-              </p>
-            </div>
+          <div className="mt-8 bg-emerald-50 border border-emerald-200 rounded-xl p-5 text-center">
+            <h3 className="text-base font-bold text-slate-900 mb-2">Need a Custom Route?</h3>
+            <p className="text-gray-600 text-sm mb-3">
+              Contact us for custom transport throughout Jordan.
+            </p>
+            <a href="tel:+962777424937" className="inline-flex items-center gap-2 text-emerald-600 font-medium hover:text-emerald-700 text-sm">
+              <Phone className="h-4 w-4" />
+              +962 777 424 937
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Popular Routes SEO Section */}
-      <section className="py-24 bg-slate-900 text-white">
-        <div className="container max-w-6xl">
-          <h2 className="text-4xl md:text-5xl font-light mb-12 text-center">
-            Popular <span className="font-bold">Transport Routes</span>
-          </h2>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <div>
-              <h3 className="text-2xl font-bold mb-4 text-amber-400">Amman Airport to Wadi Rum Transfer</h3>
-              <p className="text-gray-300 mb-4">
-                Most convenient route from Queen Alia International Airport directly to Wadi Rum. Perfect for international travelers who want to skip Amman and head straight to the desert.
-              </p>
-              <ul className="space-y-2 text-gray-300">
-                <li>• Direct airport pickup with meet & greet</li>
-                <li>• 4-hour comfortable journey to the desert</li>
-                <li>• Professional English-speaking drivers</li>
-                <li>• 110 JOD per vehicle (up to 4 passengers)</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-bold mb-4 text-amber-400">Amman to Wadi Rum Transfer</h3>
-              <p className="text-gray-300 mb-4">
-                Popular route from Jordan's capital to the stunning Wadi Rum desert. Perfect for travelers staying in Amman who want to experience the desert adventure.
-              </p>
-              <ul className="space-y-2 text-gray-300">
-                <li>• Direct transfer from Amman city center</li>
-                <li>• 4-hour comfortable journey through scenic Jordan</li>
-                <li>• Professional English-speaking drivers</li>
-                <li>• 90 JOD per vehicle (up to 4 passengers)</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-bold mb-4 text-amber-400">Petra to Wadi Rum Taxi</h3>
-              <p className="text-gray-300 mb-4">
-                Connect two of Jordan's most iconic UNESCO World Heritage sites. Many travelers visit Petra in the
-                morning and reach Wadi Rum by afternoon for sunset in the desert.
-              </p>
-              <ul className="space-y-2 text-gray-300">
-                <li>• Short 1.5-hour journey between sites</li>
-                <li>• Perfect for multi-destination itineraries</li>
-                <li>• Flexible pickup times</li>
-                <li>• 45 JOD per vehicle (up to 4 passengers)</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3 className="text-2xl font-bold mb-4 text-amber-400">Aqaba to Wadi Rum Transport</h3>
-              <p className="text-gray-300 mb-4">
-                Quick and affordable transfer from the Red Sea resort town of Aqaba to Wadi Rum. Ideal for beach lovers
-                who want to experience the desert.
-              </p>
-              <ul className="space-y-2 text-gray-300">
-                <li>• Shortest route - only 1 hour drive</li>
-                <li>• Best value for money</li>
-                <li>• Perfect for day trips to Wadi Rum</li>
-                <li>• 25 JOD per vehicle (up to 4 passengers)</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-br from-amber-500 to-orange-600">
-        <div className="container max-w-4xl text-center">
-          <h2 className="text-4xl md:text-5xl font-light text-white mb-6">
-            Ready to Book <span className="font-bold">Your Transfer?</span>
-          </h2>
-          <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-            Contact us now to reserve your comfortable, safe transfer to Wadi Rum. Available 24/7.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="#booking">
-              <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100 px-10 py-6 text-base font-semibold">
-                Book Transport Now
-              </Button>
-            </Link>
-            <Link href="/contact-us">
-              <Button
-                size="lg"
-                className="bg-white/20 hover:bg-white/30 text-white border-2 border-white backdrop-blur-sm px-10 py-6 text-base font-semibold"
-              >
-                Contact Us
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Booking Section */}
-      <section id="booking" className="py-24 bg-slate-50">
-        <div className="container px-4 md:px-8 lg:px-12">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-light text-slate-900 mb-4">
-              Book Your <span className="font-bold">Transport</span>
+      {/* Booking Form Section */}
+      <section id="booking" className="py-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="container max-w-xl">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-light text-white mb-2">
+              Book Your <span className="font-bold text-emerald-400">Transport</span>
             </h2>
-            <p className="text-lg text-gray-600">
-              Fill in the form below and specify your transport route. Check the transport option for detailed pickup information.
+            <p className="text-gray-400 text-sm">
+              We'll confirm your booking within 24 hours
             </p>
           </div>
-          <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12">
-            <BookingForm tourName="Transport Service" />
-          </div>
+
+          <form onSubmit={handleFormSubmit} className="bg-white rounded-2xl shadow-2xl p-6 md:p-8">
+            {/* Route Summary */}
+            {fromLocation && toLocation && calculatedPrice && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mb-5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-emerald-600" />
+                    <span className="font-medium text-slate-900 text-sm">{fromLocation} → {toLocation}</span>
+                  </div>
+                  <span className="text-base font-bold text-emerald-600">{calculatedPrice} JOD</span>
+                </div>
+                {travelDate && (
+                  <div className="text-xs text-gray-600 mt-1 flex items-center gap-2">
+                    <Calendar className="h-3 w-3" />
+                    {new Date(travelDate).toLocaleDateString('en-US', {
+                      weekday: 'short',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                    <span className="mx-1">•</span>
+                    <Users className="h-3 w-3" />
+                    {passengers} passenger{passengers > 1 ? 's' : ''}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="grid md:grid-cols-2 gap-4 mb-4">
+              <div>
+                <Label htmlFor="name" className="text-xs font-medium text-gray-600 mb-1 block">Full Name *</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  placeholder="Your name"
+                  className="py-2 text-sm rounded-lg"
+                />
+              </div>
+              <div>
+                <Label htmlFor="email" className="text-xs font-medium text-gray-600 mb-1 block">Email *</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder="your@email.com"
+                  className="py-2 text-sm rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <Label htmlFor="phone" className="text-xs font-medium text-gray-600 mb-1 block">Phone / WhatsApp *</Label>
+              <Input
+                id="phone"
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+1 234 567 8900"
+                className="py-2 text-sm rounded-lg"
+              />
+            </div>
+
+            {/* Inline route selection if not already selected */}
+            {(!fromLocation || !toLocation) && (
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <Label className="text-xs font-medium text-gray-600 mb-1 block">From *</Label>
+                  <select
+                    required
+                    value={fromLocation}
+                    onChange={(e) => setFromLocation(e.target.value)}
+                    className="w-full py-2 px-3 rounded-lg border border-gray-200 text-sm text-gray-700"
+                  >
+                    <option value="">Select departure</option>
+                    {locations.map(loc => (
+                      <option key={loc} value={loc}>{loc}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <Label className="text-xs font-medium text-gray-600 mb-1 block">To *</Label>
+                  <select
+                    required
+                    value={toLocation}
+                    onChange={(e) => setToLocation(e.target.value)}
+                    className="w-full py-2 px-3 rounded-lg border border-gray-200 text-sm text-gray-700"
+                  >
+                    <option value="">Select destination</option>
+                    {locations.filter(loc => loc !== fromLocation).map(loc => (
+                      <option key={loc} value={loc}>{loc}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
+
+            {!travelDate && (
+              <div className="mb-4">
+                <Label className="text-xs font-medium text-gray-600 mb-1 block">Travel Date *</Label>
+                <Input
+                  type="date"
+                  required
+                  value={travelDate}
+                  onChange={(e) => setTravelDate(e.target.value)}
+                  min={new Date().toISOString().split('T')[0]}
+                  className="py-2 text-sm rounded-lg"
+                />
+              </div>
+            )}
+
+            <div className="mb-5">
+              <Label htmlFor="message" className="text-xs font-medium text-gray-600 mb-1 block">Additional Details</Label>
+              <Textarea
+                id="message"
+                value={formData.message}
+                onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                placeholder="Pickup address, flight number, special requests..."
+                className="text-sm rounded-lg min-h-[80px]"
+              />
+            </div>
+
+            {submitStatus === "success" && (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 mb-4 text-center">
+                <CheckCircle2 className="h-6 w-6 text-emerald-500 mx-auto mb-1" />
+                <p className="text-emerald-700 font-medium text-sm">Thank you! We'll confirm your booking soon.</p>
+              </div>
+            )}
+
+            {submitStatus === "error" && (
+              <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-center">
+                <p className="text-red-700 text-sm">Something went wrong. Please try again.</p>
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              size="lg"
+              disabled={isSubmitting}
+              className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-5 text-base rounded-xl disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <>Sending...</>
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Request Booking
+                </>
+              )}
+            </Button>
+
+            <p className="text-center text-xs text-gray-500 mt-3">
+              Or WhatsApp: <a href="https://wa.me/962777424937" className="text-emerald-600 font-medium hover:underline">+962 777 424 937</a>
+            </p>
+          </form>
         </div>
       </section>
     </div>
