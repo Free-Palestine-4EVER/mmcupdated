@@ -208,7 +208,7 @@ Timestamp: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" })} (Jo
         console.log("Sending transport notification email to admin: mohammed.mutlak.camp@gmail.com")
 
         const adminResult = await emailService.emails.send({
-            from: "Jordan Transport Service <reservations@wadirum.org>",
+            from: "Jordan Transport Service <onboarding@resend.dev>",
             to: "mohammed.mutlak.camp@gmail.com",
             subject: `🚗 Transport Booking: ${formData.fromLocation} → ${formData.toLocation} (${formData.name})`,
             html: emailHTML,

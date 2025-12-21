@@ -301,7 +301,7 @@ Timestamp: ${new Date().toLocaleString("en-US", { timeZone: "Asia/Amman" })} (Jo
     console.log("Sending notification email to admin: mohammed.mutlak.camp@gmail.com")
 
     const adminResult = await emailService.emails.send({
-      from: "Wadi Rum Booking System <reservations@wadirum.org>",
+      from: "Wadi Rum Booking System <onboarding@resend.dev>",
       to: "mohammed.mutlak.camp@gmail.com",
       subject: `🌙 New Booking from ${formData.name} - ${formData.finalPrice || formData.totalPrice || 0} JOD`,
       html: emailHTML,
