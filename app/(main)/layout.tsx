@@ -3,7 +3,6 @@ import { SiteHeader } from "@/components/site-header"
 import { SiteFooter } from "@/components/site-footer"
 import { WhatsAppChat } from "@/components/whatsapp-chat"
 import { DiscountModal } from "@/components/discount-modal"
-import { FastBookingButton } from "@/components/fast-booking-modal"
 import { generateLocalBusinessSchema } from "@/lib/schema"
 import Script from "next/script"
 
@@ -22,7 +21,6 @@ export default function MainLayout({
       <SiteFooter />
       <WhatsAppChat />
       <DiscountModal />
-      <FastBookingButton />
     </>
   )
 }
