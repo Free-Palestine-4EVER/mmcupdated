@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
+import React, { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -572,11 +572,11 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
       }),
       packageDetails: selectedPackage
         ? {
-            name: selectedPackage.name,
-            price: selectedPackage.price,
-            duration: selectedPackage.duration,
-            includes: selectedPackage.includes,
-          }
+          name: selectedPackage.name,
+          price: selectedPackage.price,
+          duration: selectedPackage.duration,
+          includes: selectedPackage.includes,
+        }
         : null,
       totalPrice,
       discountAmount: totalPrice - discountedPrice,
@@ -610,9 +610,17 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
     setSubmitted(true)
   }
 
+  const successRef = React.useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (submitted && successRef.current) {
+      successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [submitted])
+
   if (submitted) {
     return (
-      <div className="p-6 bg-green-50 rounded-lg text-center">
+      <div ref={successRef} className="p-6 bg-green-50 rounded-lg text-center scroll-mt-20">
         <h3 className="text-2xl font-bold text-green-700 mb-4">Booking Request Sent!</h3>
         <p className="mb-4">
           Thank you for your booking request. We will contact you shortly to confirm your reservation.
@@ -659,6 +667,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               onChange={handleInputChange}
               required
               placeholder="Your full name"
+              className="h-12"
             />
           </div>
           <div className="space-y-2">
@@ -671,6 +680,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               onChange={handleInputChange}
               required
               placeholder="Your email address"
+              className="h-12"
             />
           </div>
         </div>
@@ -684,6 +694,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               onChange={handleInputChange}
               required
               placeholder="Your phone number"
+              className="h-12"
             />
           </div>
           <div className="space-y-2">
@@ -696,7 +707,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
               onChange={handleInputChange}
               min={todayString}
               required
-              className="w-full"
+              className="w-full h-12 appearance-none"
             />
           </div>
         </div>
@@ -706,7 +717,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
             value={formData.numPeople.toString()}
             onValueChange={(value) => handleSelectChange("numPeople", Number.parseInt(value))}
           >
-            <SelectTrigger>
+            <SelectTrigger className="h-12">
               <SelectValue placeholder="Select number of people" />
             </SelectTrigger>
             <SelectContent>
@@ -725,7 +736,7 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
         <div className="space-y-2">
           <Label htmlFor="package">Select a Package</Label>
           <Select value={formData.package} onValueChange={(value) => handleSelectChange("package", value)}>
-            <SelectTrigger>
+            <SelectTrigger className="h-12">
               <SelectValue placeholder="Select a package (optional)" />
             </SelectTrigger>
             <SelectContent>
@@ -1108,9 +1119,8 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
                   if (qualifiesForFreeTentedCamp && formData.accommodation === "tented-camp") {
                     return "FREE (Included with tour)"
                   } else {
-                    return `${accommodation.price} JOD × ${formData.numPeople} = ${
-                      accommodation.price * formData.numPeople
-                    } JOD`
+                    return `${accommodation.price} JOD × ${formData.numPeople} = ${accommodation.price * formData.numPeople
+                      } JOD`
                   }
                 })()}
               </span>
@@ -1118,38 +1128,38 @@ export function BookingForm({ tourName, packageName }: BookingFormProps) {
           )}
 
           {selectedTours.map((tourId) => {
-              const tour = tourOptions.find((t) => t.id === tourId)
-              if (!tour) return null // Handle the case where tour might be undefined
+            const tour = tourOptions.find((t) => t.id === tourId)
+            if (!tour) return null // Handle the case where tour might be undefined
 
-              let priceDisplay = ""
-              if (tour.id === "stargazing") {
-                if (formData.numPeople <= 3) {
-                  const pricePerPerson = 100 / formData.numPeople
-                  const totalPrice = 100
-                  priceDisplay = `${pricePerPerson.toFixed(2)} JOD × ${formData.numPeople} = ${totalPrice} JOD`
-                } else {
-                  const totalPrice = 100 + (formData.numPeople - 3) * 15
-                  const pricePerPerson = totalPrice / formData.numPeople
-                  priceDisplay = `${pricePerPerson.toFixed(2)} JOD × ${formData.numPeople} = ${totalPrice} JOD`
-                }
-              } else if (tour.id === "night-walk") {
-                if (formData.numPeople < 5) {
-                  priceDisplay = `10 JOD per person (minimum 5 persons required)`
-                } else {
-                  priceDisplay = `10 JOD × ${formData.numPeople} = ${10 * formData.numPeople} JOD`
-                }
+            let priceDisplay = ""
+            if (tour.id === "stargazing") {
+              if (formData.numPeople <= 3) {
+                const pricePerPerson = 100 / formData.numPeople
+                const totalPrice = 100
+                priceDisplay = `${pricePerPerson.toFixed(2)} JOD × ${formData.numPeople} = ${totalPrice} JOD`
               } else {
-                const price = getTourPrice(tour, formData.numPeople)
-                priceDisplay = `${price} JOD × ${formData.numPeople} = ${price * formData.numPeople} JOD`
+                const totalPrice = 100 + (formData.numPeople - 3) * 15
+                const pricePerPerson = totalPrice / formData.numPeople
+                priceDisplay = `${pricePerPerson.toFixed(2)} JOD × ${formData.numPeople} = ${totalPrice} JOD`
               }
+            } else if (tour.id === "night-walk") {
+              if (formData.numPeople < 5) {
+                priceDisplay = `10 JOD per person (minimum 5 persons required)`
+              } else {
+                priceDisplay = `10 JOD × ${formData.numPeople} = ${10 * formData.numPeople} JOD`
+              }
+            } else {
+              const price = getTourPrice(tour, formData.numPeople)
+              priceDisplay = `${price} JOD × ${formData.numPeople} = ${price * formData.numPeople} JOD`
+            }
 
-              return (
-                <div key={tourId} className="flex justify-between mb-2">
-                  <span>{tour.name}:</span>
-                  <span className="font-medium">{priceDisplay}</span>
-                </div>
-              )
-            })}
+            return (
+              <div key={tourId} className="flex justify-between mb-2">
+                <span>{tour.name}:</span>
+                <span className="font-medium">{priceDisplay}</span>
+              </div>
+            )
+          })}
 
           {/* Transport price (no discount) */}
           {formData.transportRoute && (

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
+import React, { useState, useEffect, type ChangeEvent, type FormEvent } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -301,9 +301,17 @@ export function BivouacBookingForm() {
     setSubmitted(true)
   }
 
+  const successRef = React.useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (submitted && successRef.current) {
+      successRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [submitted])
+
   if (submitted) {
     return (
-      <div className="p-6 bg-green-50 rounded-lg text-center">
+      <div ref={successRef} className="p-6 bg-green-50 rounded-lg text-center scroll-mt-20">
         <h3 className="text-2xl font-bold text-green-700 mb-4">Booking Request Sent!</h3>
         <p className="mb-4">
           Thank you for your booking request. We will contact you shortly to confirm your reservation.
@@ -344,6 +352,7 @@ export function BivouacBookingForm() {
               onChange={handleInputChange}
               required
               placeholder="Your full name"
+              className="h-12"
             />
           </div>
           <div className="space-y-2">
@@ -356,6 +365,7 @@ export function BivouacBookingForm() {
               onChange={handleInputChange}
               required
               placeholder="Your email address"
+              className="h-12"
             />
           </div>
         </div>
@@ -369,6 +379,7 @@ export function BivouacBookingForm() {
               onChange={handleInputChange}
               required
               placeholder="Your phone number"
+              className="h-12"
             />
           </div>
           <div className="space-y-2">
@@ -381,7 +392,7 @@ export function BivouacBookingForm() {
               onChange={handleInputChange}
               min={todayString}
               required
-              className="w-full"
+              className="w-full h-12 appearance-none"
             />
           </div>
         </div>
