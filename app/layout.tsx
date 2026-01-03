@@ -2,11 +2,6 @@ import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { SiteHeader } from "@/components/site-header"
-import { SiteFooter } from "@/components/site-footer"
-import { WhatsAppChat } from "@/components/whatsapp-chat"
-import { DiscountModal } from "@/components/discount-modal"
-import { generateLocalBusinessSchema } from "@/lib/schema"
 import Script from "next/script"
 import { Analytics } from "@vercel/analytics/next"
 
@@ -49,7 +44,7 @@ export const metadata: Metadata = {
     images: ["/images/traditional-camp.jpg"], // Relative path works better for Twitter cards
     creator: "@MohammedMutlakCamp",
   },
-    generator: 'v0.app'
+  generator: 'v0.app'
 }
 
 export default function RootLayout({
@@ -57,9 +52,6 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Generate the LocalBusiness schema with default values
-  const localBusinessSchema = generateLocalBusinessSchema()
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -80,23 +72,14 @@ export default function RootLayout({
             `,
           }}
         />
-        <Script
-          id="local-business-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-        />
         {/* Add explicit meta tags for Facebook */}
         <meta property="og:image" content="/images/traditional-camp.jpg" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content="Mohammed Mutlak Camp - Traditional Bedouin Camp in Wadi Rum" />
       </head>
-      <body className="min-h-screen bg-white font-sans antialiased">
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
-        <WhatsAppChat />
-        <DiscountModal />
+      <body className={`min-h-screen bg-white font-sans antialiased ${inter.className}`}>
+        {children}
         <Analytics />
       </body>
     </html>
