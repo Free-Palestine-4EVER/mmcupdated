@@ -171,6 +171,12 @@ export const translations: Record<Language, Record<string, string>> = {
         items: "items",
         community_impact: "Community Impact",
 
+        // Review
+        enjoying_stay: "Enjoying your stay?",
+        review_prompt: "Write us a review on Google for a surprise!",
+        write_review: "Write Review",
+        back_to_menu: "Back to Menu",
+
         // Cart
         your_cart: "Your Cart",
         total: "Total",
@@ -178,9 +184,6 @@ export const translations: Record<Language, Record<string, string>> = {
         added_to_cart: "Added to cart",
         cart_empty: "Your cart is empty",
         name: "Full Name",
-        email: "Email Address",
-        phone: "WhatsApp Number",
-        room: "Room / Tent Number",
         confirm_order: "Confirm Order",
         order_success: "Order Placed Successfully!",
         order_success_msg: "We have received your order. Someone will be with you shortly.",

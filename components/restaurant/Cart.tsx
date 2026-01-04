@@ -111,18 +111,18 @@ export function Cart({
                             <Star key={i} className="w-6 h-6 fill-current" />
                         ))}
                     </div>
-                    <h3 className="font-semibold text-amber-900">Enjoying your stay?</h3>
-                    <p className="text-sm text-amber-700">write us review on google for a surprise</p>
+                    <h3 className="font-semibold text-amber-900">{t.enjoying_stay || "Enjoying your stay?"}</h3>
+                    <p className="text-sm text-amber-700">{t.review_prompt || "Write us a review on Google for a surprise!"}</p>
                     <Button
                         className="w-full bg-white text-amber-600 border border-amber-200 hover:bg-amber-100"
                         onClick={() => window.open("https://share.google/c3VsYxESZM0Vw6OPu", "_blank")}
                     >
-                        Write Review
+                        {t.write_review || "Write Review"}
                     </Button>
                 </div>
 
                 <Button onClick={onBack} variant="outline" className="mt-8">
-                    Back to Menu
+                    {t.back_to_menu || "Back to Menu"}
                 </Button>
             </div>
         )
@@ -190,17 +190,6 @@ export function Cart({
                                     value={formData.name}
                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                     className="rounded-xl h-12"
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="room">{t.room}</Label>
-                                <Input
-                                    id="room"
-                                    required
-                                    value={formData.room}
-                                    onChange={(e) => setFormData({ ...formData, room: e.target.value })}
-                                    className="rounded-xl h-12"
-                                    placeholder="Tent 5 / Room 10"
                                 />
                             </div>
                         </div>
