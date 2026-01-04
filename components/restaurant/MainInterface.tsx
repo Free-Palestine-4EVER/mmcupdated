@@ -6,8 +6,7 @@ import { Language, Currency, Product, products } from "@/lib/restaurant-data"
 import { Button } from "@/components/ui/button"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
-// Import Lucide icons
-import { Plus, ShoppingBag, UtensilsCrossed, Compass, Sprout, Coffee, Moon, Stars } from "lucide-react"
+import { Plus, ShoppingBag, UtensilsCrossed, Compass, Sprout, Coffee, Moon, Stars, Tent, Map, Clock, Wine, Flame } from "lucide-react"
 
 interface MainInterfaceProps {
     language: Language
@@ -31,6 +30,8 @@ export function MainInterface({
     currencySymbol,
 }: MainInterfaceProps) {
     const [activeTab, setActiveTab] = useState<"restaurant" | "tours" | "tree">("restaurant")
+    const [restaurantSubTab, setRestaurantSubTab] = useState<"food" | "drinks" | "shisha">("food")
+    const [toursSubTab, setToursSubTab] = useState<"camp" | "website">("camp")
 
     const totalItems = cart.reduce((acc, item) => acc + item.quantity, 0)
     const totalPrice = cart.reduce((acc, item) => {
@@ -38,36 +39,50 @@ export function MainInterface({
         return acc + (product ? product.price * item.quantity : 0)
     }, 0)
 
-    // Filter products based on active tab
+    // Filter products based on active tab and sub-tab
     const displayedProducts = products.filter((p) => {
-        if (activeTab === "restaurant") return p.category.startsWith("restaurant") || p.category === "cafe"
-        if (activeTab === "tours") return p.category === "tours"
+        if (activeTab === "restaurant") {
+            if (restaurantSubTab === "food") return p.category.startsWith("restaurant")
+            if (restaurantSubTab === "drinks") return p.category === "drinks"
+            if (restaurantSubTab === "shisha") return p.category === "shisha"
+        }
+        if (activeTab === "tours") {
+            if (toursSubTab === "camp") return p.category === "camp-activity"
+            if (toursSubTab === "website") return p.category === "website-tour"
+        }
         if (activeTab === "tree") return p.category === "tree"
         return false
     })
 
-    // Group restaurant items by sub-category
-    const groupedProducts = activeTab === "restaurant"
+    // Group restaurant food items by meal type
+    const groupedProducts = activeTab === "restaurant" && restaurantSubTab === "food"
         ? {
-            [t.cat_breakfast]: displayedProducts.filter(p => p.category === "restaurant-breakfast"),
-            [t.cat_lunch]: displayedProducts.filter(p => p.category === "restaurant-lunch"),
-            [t.cat_dinner]: displayedProducts.filter(p => p.category === "restaurant-dinner"),
-            [t.cat_cafe]: displayedProducts.filter(p => p.category === "cafe"),
+            [t.cat_breakfast || "Breakfast"]: displayedProducts.filter(p => p.category === "restaurant-breakfast"),
+            [t.cat_lunch || "Lunch"]: displayedProducts.filter(p => p.category === "restaurant-lunch"),
+            [t.cat_dinner || "Dinner"]: displayedProducts.filter(p => p.category === "restaurant-dinner"),
         }
-        : { [activeTab === "tours" ? t.tab_tours : t.tab_tree]: displayedProducts }
+        : activeTab === "restaurant" && restaurantSubTab === "drinks"
+            ? { [t.cat_drinks || "Drinks"]: displayedProducts }
+            : activeTab === "restaurant" && restaurantSubTab === "shisha"
+                ? { [t.cat_shisha || "Shisha"]: displayedProducts }
+                : activeTab === "tours"
+                    ? { [toursSubTab === "camp" ? (t.cat_camp_activities || "Activities from Camp") : (t.cat_website_tours || "Full Desert Tours")]: displayedProducts }
+                    : { [t.tab_tree || "Plant a Tree"]: displayedProducts }
 
     const CategoryIcon = ({ category }: { category: string }) => {
-        if (category === t.cat_breakfast) return <UtensilsCrossed className="w-5 h-5 text-amber-500" />
-        if (category === t.cat_lunch) return <UtensilsCrossed className="w-5 h-5 text-orange-500" />
-        if (category === t.cat_dinner) return <Moon className="w-5 h-5 text-indigo-500" />
-        if (category === t.cat_cafe) return <Coffee className="w-5 h-5 text-amber-700" />
-        if (category === t.tab_tours) return <Compass className="w-5 h-5 text-blue-500" />
-        if (category === t.tab_tree) return <Sprout className="w-5 h-5 text-green-500" />
+        if (category === (t.cat_breakfast || "Breakfast")) return <UtensilsCrossed className="w-5 h-5 text-amber-500" />
+        if (category === (t.cat_lunch || "Lunch")) return <UtensilsCrossed className="w-5 h-5 text-orange-500" />
+        if (category === (t.cat_dinner || "Dinner")) return <Moon className="w-5 h-5 text-indigo-500" />
+        if (category === (t.cat_drinks || "Drinks")) return <Coffee className="w-5 h-5 text-amber-700" />
+        if (category === (t.cat_shisha || "Shisha")) return <Flame className="w-5 h-5 text-red-500" />
+        if (category === (t.cat_camp_activities || "Activities from Camp")) return <Tent className="w-5 h-5 text-amber-600" />
+        if (category === (t.cat_website_tours || "Full Desert Tours")) return <Map className="w-5 h-5 text-blue-500" />
+        if (category === (t.tab_tree || "Plant a Tree")) return <Sprout className="w-5 h-5 text-green-500" />
         return <Stars className="w-5 h-5 text-amber-400" />
     }
 
     return (
-        <div className="flex flex-col h-screen max-w-md mx-auto bg-slate-50 shadow-2xl overflow-hidden font-sans">
+        <div className="flex flex-col h-screen max-w-md mx-auto bg-slate-50 shadow-2xl overflow-hidden font-sans relative">
             {/* Header */}
             <div className="sticky top-0 z-30 bg-white/80 backdrop-blur-xl border-b border-white/20 px-6 py-4 flex justify-between items-center shadow-sm">
                 <div>
@@ -99,34 +114,106 @@ export function MainInterface({
                 </AnimatePresence>
             </div>
 
-            {/* Tabs */}
+            {/* Main Tabs */}
             <div className="flex p-1.5 bg-slate-100/50 mx-4 mt-4 rounded-2xl border border-white shadow-inner gap-1">
                 <TabButton
                     active={activeTab === "restaurant"}
                     onClick={() => setActiveTab("restaurant")}
                     icon={<UtensilsCrossed className="w-4 h-4" />}
                 >
-                    {t.tab_restaurant}
+                    {t.tab_restaurant || "Restaurant & Cafe"}
                 </TabButton>
                 <TabButton
                     active={activeTab === "tours"}
                     onClick={() => setActiveTab("tours")}
                     icon={<Compass className="w-4 h-4" />}
                 >
-                    {t.tab_tours}
+                    {t.tab_tours || "Tours & Experiences"}
                 </TabButton>
                 <TabButton
                     active={activeTab === "tree"}
                     onClick={() => setActiveTab("tree")}
                     icon={<Sprout className="w-4 h-4" />}
                 >
-                    {t.tab_tree}
+                    {t.tab_tree || "Plant a Tree"}
                 </TabButton>
             </div>
 
+            {/* Restaurant Sub-tabs */}
+            {activeTab === "restaurant" && (
+                <div className="flex mx-4 mt-3 gap-2">
+                    <button
+                        onClick={() => setRestaurantSubTab("food")}
+                        className={cn(
+                            "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
+                            restaurantSubTab === "food"
+                                ? "bg-amber-500 text-white shadow-md"
+                                : "bg-white border border-slate-200 text-slate-600 hover:bg-amber-50"
+                        )}
+                    >
+                        <UtensilsCrossed className="w-4 h-4" />
+                        <span className="text-xs">{t.cat_food || "Food"}</span>
+                    </button>
+                    <button
+                        onClick={() => setRestaurantSubTab("drinks")}
+                        className={cn(
+                            "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
+                            restaurantSubTab === "drinks"
+                                ? "bg-amber-700 text-white shadow-md"
+                                : "bg-white border border-slate-200 text-slate-600 hover:bg-amber-50"
+                        )}
+                    >
+                        <Coffee className="w-4 h-4" />
+                        <span className="text-xs">{t.cat_drinks || "Drinks"}</span>
+                    </button>
+                    <button
+                        onClick={() => setRestaurantSubTab("shisha")}
+                        className={cn(
+                            "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
+                            restaurantSubTab === "shisha"
+                                ? "bg-red-500 text-white shadow-md"
+                                : "bg-white border border-slate-200 text-slate-600 hover:bg-red-50"
+                        )}
+                    >
+                        <Flame className="w-4 h-4" />
+                        <span className="text-xs">{t.cat_shisha || "Shisha"}</span>
+                    </button>
+                </div>
+            )}
+
+            {/* Tours Sub-tabs */}
+            {activeTab === "tours" && (
+                <div className="flex mx-4 mt-3 gap-2">
+                    <button
+                        onClick={() => setToursSubTab("camp")}
+                        className={cn(
+                            "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
+                            toursSubTab === "camp"
+                                ? "bg-amber-500 text-white shadow-md"
+                                : "bg-white border border-slate-200 text-slate-600 hover:bg-amber-50"
+                        )}
+                    >
+                        <Tent className="w-4 h-4" />
+                        <span className="text-xs">{t.cat_camp_activities || "Activities from Camp"}</span>
+                    </button>
+                    <button
+                        onClick={() => setToursSubTab("website")}
+                        className={cn(
+                            "flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-sm font-medium transition-all",
+                            toursSubTab === "website"
+                                ? "bg-blue-500 text-white shadow-md"
+                                : "bg-white border border-slate-200 text-slate-600 hover:bg-blue-50"
+                        )}
+                    >
+                        <Map className="w-4 h-4" />
+                        <span className="text-xs">{t.cat_website_tours || "Full Desert Tours"}</span>
+                    </button>
+                </div>
+            )}
+
             {/* Content */}
             <ScrollArea className="flex-1 px-4 py-6">
-                <div className="space-y-8 pb-24">
+                <div className={cn("space-y-8", totalItems > 0 ? "pb-32" : "pb-24")}>
                     {Object.entries(groupedProducts).map(([category, items], sectionIndex) => (
                         items.length > 0 && (
                             <motion.div
@@ -160,6 +247,29 @@ export function MainInterface({
                     ))}
                 </div>
             </ScrollArea>
+
+            {/* Sticky Checkout Button at Bottom */}
+            <AnimatePresence>
+                {totalItems > 0 && (
+                    <motion.div
+                        initial={{ y: 100, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: 100, opacity: 0 }}
+                        className="absolute bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-xl border-t border-slate-200 shadow-2xl"
+                    >
+                        <Button
+                            onClick={onViewCart}
+                            className="w-full h-14 rounded-2xl bg-amber-500 hover:bg-amber-600 text-white text-lg font-bold shadow-lg shadow-amber-200 flex items-center justify-center gap-3"
+                        >
+                            <ShoppingBag className="w-5 h-5" />
+                            <span>{t.checkout || "Checkout"}</span>
+                            <span className="bg-white/20 px-3 py-1 rounded-full text-sm">
+                                {totalItems} {t.items || "items"} • {(totalPrice * currencyRate).toFixed(2)} {currencySymbol}
+                            </span>
+                        </Button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     )
 }
@@ -214,12 +324,18 @@ function ProductCard({
                         </p>
                     )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                     <div className="font-bold text-amber-600 bg-amber-50 px-2.5 py-1 rounded-lg text-sm inline-block">
                         {(product.price * currencyRate).toFixed(2)} {currencySymbol}
                     </div>
+                    {product.duration && (
+                        <span className="flex items-center gap-1 text-[10px] uppercase font-bold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg">
+                            <Clock className="w-3 h-3" />
+                            {product.duration}
+                        </span>
+                    )}
                     {product.category === "tree" && (
-                        <span className="text-[10px] uppercase font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">Community Impact</span>
+                        <span className="text-[10px] uppercase font-bold text-green-600 bg-green-50 px-2 py-1 rounded-lg">{t.community_impact || "Community Impact"}</span>
                     )}
                 </div>
             </div>

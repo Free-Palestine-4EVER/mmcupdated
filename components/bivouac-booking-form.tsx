@@ -392,7 +392,7 @@ export function BivouacBookingForm() {
               onChange={handleInputChange}
               min={todayString}
               required
-              className="w-full h-12 appearance-none"
+              className="w-full h-12 text-left text-base [&::-webkit-date-and-time-value]:text-left [&::-webkit-datetime-edit]:text-left"
             />
           </div>
         </div>

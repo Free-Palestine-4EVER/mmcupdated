@@ -25,38 +25,53 @@ export const currencies: { id: Currency; symbol: string; rate: number }[] = [
 
 export type Product = {
     id: string
-    category: "restaurant-breakfast" | "restaurant-lunch" | "restaurant-dinner" | "cafe" | "tours" | "tree"
+    category: "restaurant-breakfast" | "restaurant-lunch" | "restaurant-dinner" | "drinks" | "shisha" | "camp-activity" | "website-tour" | "tree"
     price: number // in JOD
     image?: string
+    duration?: string
 }
 
 export const products: Product[] = [
-    // Restaurant - Breakfast
+    // Food (Breakfast, Lunch, Dinner)
     { id: "breakfast", category: "restaurant-breakfast", price: 5 },
-    // Restaurant - Lunch
     { id: "lunch", category: "restaurant-lunch", price: 7 },
-    // Restaurant - Dinner
     { id: "dinner", category: "restaurant-dinner", price: 10 },
 
-    // Cafe
-    { id: "water", category: "cafe", price: 1 },
-    { id: "turkish-coffee", category: "cafe", price: 1 },
-    { id: "arabic-coffee", category: "cafe", price: 5 },
-    { id: "karak-tea", category: "cafe", price: 1 },
-    { id: "cola", category: "cafe", price: 1 },
-    { id: "fanta", category: "cafe", price: 1 },
-    { id: "sprite", category: "cafe", price: 1 },
-    { id: "cola-zero", category: "cafe", price: 1 },
-    { id: "bavaria", category: "cafe", price: 2 },
-    { id: "shisha-apple", category: "cafe", price: 5 },
-    { id: "shisha-lemon", category: "cafe", price: 5 },
+    // Drinks
+    { id: "water", category: "drinks", price: 1 },
+    { id: "turkish-coffee", category: "drinks", price: 1 },
+    { id: "arabic-coffee", category: "drinks", price: 5 },
+    { id: "karak-tea", category: "drinks", price: 1 },
+    { id: "cola", category: "drinks", price: 1 },
+    { id: "fanta", category: "drinks", price: 1 },
+    { id: "sprite", category: "drinks", price: 1 },
+    { id: "cola-zero", category: "drinks", price: 1 },
+    { id: "bavaria", category: "drinks", price: 2 },
 
-    // Tours
-    { id: "night-walk", category: "tours", price: 10 },
-    { id: "water-cave", category: "tours", price: 20 },
-    { id: "night-jeep", category: "tours", price: 15 },
-    { id: "bedouin-bread", category: "tours", price: 15 },
-    { id: "stargazing", category: "tours", price: 150 },
+    // Shisha
+    { id: "shisha-apple", category: "shisha", price: 5 },
+    { id: "shisha-lemon", category: "shisha", price: 5 },
+
+
+    // Camp Activities (bookable from room)
+    { id: "night-walk", category: "camp-activity", price: 10, duration: "1.5h" },
+    { id: "water-cave", category: "camp-activity", price: 20, duration: "2h" },
+    { id: "night-jeep", category: "camp-activity", price: 15, duration: "1h" },
+    { id: "bedouin-bread", category: "camp-activity", price: 15, duration: "1h" },
+    { id: "stargazing", category: "camp-activity", price: 150, duration: "2h" },
+    { id: "camel-riding", category: "camp-activity", price: 25, duration: "1h" },
+
+    // Website Tours (full day experiences)
+    { id: "half-day-jeep", category: "website-tour", price: 50, duration: "4h" },
+    { id: "full-day-jeep", category: "website-tour", price: 65, duration: "7h" },
+    { id: "beduin-way", category: "website-tour", price: 140, duration: "2 days" },
+    { id: "jebel-khash", category: "website-tour", price: 140, duration: "1 day" },
+    { id: "hot-air-balloon", category: "website-tour", price: 200, duration: "1-2h" },
+    { id: "burdah-arch", category: "website-tour", price: 110, duration: "1 day" },
+    { id: "all-in-one", category: "website-tour", price: 110, duration: "1 day" },
+    { id: "um-addami", category: "website-tour", price: 110, duration: "7h" },
+    { id: "trekking", category: "website-tour", price: 140, duration: "1 day" },
+    { id: "two-hour-jeep", category: "website-tour", price: 25, duration: "2h" },
 
     // Tree
     { id: "plant-tree", category: "tree", price: 20 },
@@ -115,8 +130,46 @@ export const translations: Record<Language, Record<string, string>> = {
         item_stargazing: "Stargazing Education",
         item_stargazing_desc: "Professional stargazing session with telescope and guide.",
 
+        item_camel_riding: "Camel Riding",
+        item_camel_riding_desc: "Peaceful 1-hour camel ride through the desert landscape.",
+
+        // Website Tours
+        item_half_day_jeep: "Half Day Jeep Tour",
+        item_half_day_jeep_desc: "4-hour tour visiting key sites and enjoying the desert landscape.",
+        item_full_day_jeep: "Full Day Jeep Tour",
+        item_full_day_jeep_desc: "7-hour comprehensive tour exploring the vast beauty of Wadi Rum.",
+        item_beduin_way: "The Beduin Way",
+        item_beduin_way_desc: "2-day immersive experience with jeep tour and camel ride.",
+        item_jebel_khash: "Jebel Khash Route",
+        item_jebel_khash_desc: "Full day exploring spectacular rock formations and vistas.",
+        item_hot_air_balloon: "Hot Air Balloon",
+        item_hot_air_balloon_desc: "Soar above the desert for an unforgettable aerial view.",
+        item_burdah_arch: "Burdah Arch Climbing",
+        item_burdah_arch_desc: "Guided climb to the iconic Burdah Rock Bridge.",
+        item_all_in_one: "All in One Day",
+        item_all_in_one_desc: "Jeep tour, camel ride, and short hike in one day.",
+        item_um_addami: "Jebel Um Addami",
+        item_um_addami_desc: "Climb Jordan's highest peak for amazing views.",
+        item_trekking: "Trekking in the Wild",
+        item_trekking_desc: "Guided trekking adventure for an intimate desert connection.",
+        item_two_hour_jeep: "2 Hours Jeep Tour",
+        item_two_hour_jeep_desc: "Quick introduction to Wadi Rum's key sites.",
+
         item_plant_tree: "Plant an Olive Tree",
         item_plant_tree_desc: "Help the community green the desert. We will plant an olive tree in your name and send you monthly progress pictures/videos. Includes transfer & planting ceremony.",
+
+        // Sub-tabs for Tours
+        cat_camp_activities: "Activities from Camp",
+        cat_website_tours: "Full Desert Tours",
+
+        // Sub-tabs for Restaurant
+        cat_food: "Food",
+        cat_drinks: "Drinks",
+        cat_shisha: "Shisha",
+
+        // Misc
+        items: "items",
+        community_impact: "Community Impact",
 
         // Cart
         your_cart: "Your Cart",
@@ -145,7 +198,13 @@ export const translations: Record<Language, Record<string, string>> = {
         cat_breakfast: "Frühstück",
         cat_lunch: "Mittagessen",
         cat_dinner: "Abendessen",
-        cat_cafe: "Café Menü",
+        cat_food: "Essen",
+        cat_drinks: "Getränke",
+        cat_shisha: "Shisha",
+        cat_camp_activities: "Aktivitäten vom Camp",
+        cat_website_tours: "Wüsten-Touren",
+        items: "Artikel",
+        community_impact: "Gemeinschaftsprojekt",
 
         item_breakfast: "Traditionelles Beduinen-Frühstück",
         item_breakfast_desc: "Frisches Brot, Hummus, Falafel, Käse, Marmelade, Eier, Tee/Kaffee",
