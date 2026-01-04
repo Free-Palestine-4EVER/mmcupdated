@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
     // 1. Send email to Owner
     await resend.emails.send({
-      from: "Wadi Rum Orders <orders@wadirum.org>", // Ensure this domain is verified in Resend, otherwise use 'onboarding@resend.dev' for testing if allowed, but user has wadirum.org
+      from: "MMC Orders <onboarding@resend.dev>",
       to: OWNER_EMAIL,
       subject: `New Order from ${name} (Room ${room})`,
       html: `
