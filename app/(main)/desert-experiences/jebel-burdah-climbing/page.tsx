@@ -148,7 +148,7 @@ export default function JebelBurdahClimbingPage() {
                 <div className="overflow-hidden rounded-lg border">
                   <div className="grid grid-cols-2 border-b bg-amber-50">
                     <div className="border-r p-4 font-medium">1 Person</div>
-                    <div className="p-4 font-medium">80 JOD</div>
+                    <div className="p-4 font-medium">80 JOD per person</div>
                   </div>
                   <div className="grid grid-cols-2 border-b">
                     <div className="border-r p-4">2-3 Persons</div>

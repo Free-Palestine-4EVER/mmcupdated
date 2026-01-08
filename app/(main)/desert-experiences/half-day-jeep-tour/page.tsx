@@ -117,15 +117,15 @@ export default function HalfDayJeepTourPage() {
                 <div className="overflow-hidden rounded-lg border">
                   <div className="grid grid-cols-2 border-b bg-amber-50">
                     <div className="border-r p-4 font-medium">1-3 Persons</div>
-                    <div className="p-4 font-medium">50 JOD</div>
+                    <div className="p-4 font-medium">50 JOD per person</div>
                   </div>
                   <div className="grid grid-cols-2 border-b">
                     <div className="border-r p-4">4-6 Persons</div>
-                    <div className="p-4">45 JOD</div>
+                    <div className="p-4">45 JOD per person</div>
                   </div>
                   <div className="grid grid-cols-2 border-b">
                     <div className="border-r p-4">7 or more Persons</div>
-                    <div className="p-4">35 JOD</div>
+                    <div className="p-4">35 JOD per person</div>
                   </div>
                   <div className="grid grid-cols-2 border-b">
                     <div className="border-r p-4">Children 5-12 Years</div>
